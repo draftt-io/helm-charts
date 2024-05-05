@@ -1,5 +1,5 @@
 cronjob:
-  schedule: "*/1 * * * *"
+  schedule: "0 */8 * * *" # CronJob timing config, you can build it at: https://crontab.guru
   maxRetries: 3
   restartPolicy: "OnFailure"  
   image:
