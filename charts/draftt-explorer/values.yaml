@@ -3,7 +3,7 @@ cronjob:
   maxRetries: 3
   restartPolicy: "OnFailure"  
   image:
-    repository: 730335423362.dkr.ecr.us-east-1.amazonaws.com/draftt/draftt-k8s-explorer
+    repository: public.ecr.aws/r8f4n6y4/draftt-explorer:0.0.1
     tag: 0.0.1
     pullPolicy: Always
     pullSecrets: []
