@@ -1,0 +1,64 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "draftt-k8s-explorer.fullname" . }}
+  namespace: {{ .Values.appConfig.namespace }}
+spec:
+  schedule: "{{ .Values.cronjob.schedule }}"
+  failedJobsHistoryLimit: {{ default 3 .Values.cronjob.failedJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ default 1 .Values.cronjob.successfulJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      backoffLimit: {{ .Values.cronjob.maxRetries }}
+      template:
+        metadata:
+          labels:
+            app: {{ include "draftt-k8s-explorer.fullname" . }}
+        spec:
+          serviceAccountName: {{ .Values.serviceAccount.name }}
+          containers:
+          - name: draftt-k8s-explorerrer
+            image: "{{ .Values.cronjob.image.repository }}:{{ .Values.cronjob.image.tag }}"
+            imagePullPolicy: {{ .Values.cronjob.image.pullPolicy }}
+            env:
+              # Environment variables based on the appConfig
+              - name: DRAFTT_COMPONENT_IDENTIFIER
+                value: "{{ .Values.appConfig.clusterIdentifier }}"
+              {{- if .Values.appConfig.aws.region }}
+              - name: AWS_REGION
+                value: "{{ .Values.appConfig.aws.region }}"
+              {{- end }}
+              {{- if .Values.appConfig.aws.accessKeyId }}
+              - name: AWS_ACCESS_KEY_ID
+                value: "{{ .Values.appConfig.aws.accessKeyId }}"
+              {{- end }}
+              {{- if .Values.appConfig.aws.secretAccessKey }}
+              - name: AWS_SECRET_ACCESS_KEY
+                value: "{{ .Values.appConfig.aws.secretAccessKey }}"
+              {{- end }}
+              {{- if .Values.appConfig.s3.bucketName }}
+              - name: S3_BUCKET_NAME
+                value: "{{ .Values.appConfig.s3.bucketName }}"
+              {{- end }}
+              {{- if and .Values.appConfig.s3.endpoint (not (eq .Values.appConfig.s3.endpoint "")) }}
+              - name: S3_ENDPOINT
+                value: "{{ .Values.appConfig.s3.endpoint }}"
+              {{- end }}
+              {{- if .Values.appConfig.api.drafttApiUrl }}
+              - name: DRAFTT_API_ENDPOINT
+                value: "{{ .Values.appConfig.api.drafttApiUrl }}"
+              {{- end }}              
+              {{- if .Values.appConfig.api.drafttApiToken }}
+              - name: DRAFTT_API_TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Values.appConfig.api.drafttApiToken.secretName }}"
+                    key: "{{ .Values.appConfig.api.drafttApiToken.secretKey }}"
+              {{- end }}
+          restartPolicy: {{ default "OnFailure" .Values.cronjob.restartPolicy }}
+          {{- if .Values.cronjob.image.pullSecrets }}
+          imagePullSecrets:
+          {{- range .Values.cronjob.image.pullSecrets }}
+          - name: {{ . }}
+          {{- end }}
+          {{- end }}

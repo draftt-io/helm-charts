@@ -1,0 +1,32 @@
+cronjob:
+  schedule: "*/1 * * * *"
+  maxRetries: 3
+  restartPolicy: "OnFailure"  
+  image:
+    repository: 730335423362.dkr.ecr.us-east-1.amazonaws.com/draftt/draftt-k8s-explorer
+    tag: 0.0.1
+    pullPolicy: Always
+    pullSecrets: []
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+
+appConfig:
+  namespace: monitoring # The namespace that resources will be deployed on
+  clusterIdentifier: "arn:aws:eks:us-west-2:339712924365:cluster/prod-us-west-2"
+  s3:
+    endpoint: ""
+    bucketName: ""
+  aws:
+    region: ""
+    accessKeyId: ""
+    secretAccessKey: ""
+  api:
+    drafttApiUrl: "https://api.draftt.io/component/k8s"
+    drafttApiToken: # You should Create a k8s generic secret 
+      secretName: "draftt-api-token"
+      secretKey: "drafttApiToken"
+      
+serviceAccount:
+  create: true
+  name: draftt-explorer
+  roleArn: ""  # AWS IAM Role ARN for the service account with S3 access
