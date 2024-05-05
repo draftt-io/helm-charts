@@ -1,0 +1,8 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Values.serviceAccount.name }}-readonly
+rules:
+- apiGroups: ["*"] # A wildcard to include all API groups
+  resources: ["*"] # A wildcard to include all resources
+  verbs: ["get", "list", "watch"]  # read only access
