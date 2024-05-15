@@ -3,7 +3,7 @@ cronjob:
   maxRetries: 3
   restartPolicy: "OnFailure"  
   image:
-    repository: public.ecr.aws/r8f4n6y4/draftt-explorer
+    repository: public.ecr.aws/draftt-io/draftt-explorer
     tag: 0.0.1
     pullPolicy: Always
     pullSecrets: []
