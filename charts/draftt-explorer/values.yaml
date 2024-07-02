@@ -7,8 +7,15 @@ cronjob:
     tag: 0.0.1
     pullPolicy: Always
     pullSecrets: []
+  resources: # per recommendations, we did not set resource limits by default, you can set it here
+    requests:
+      cpu: 100m
+      memory: 256Mi
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 3
+  labels: {}
+  nodeSelector: {}
+
 
 appConfig:
   namespace: monitoring # The namespace that resources will be deployed on
@@ -30,3 +37,10 @@ serviceAccount:
   create: true
   name: draftt-explorer
   roleArn: ""  # AWS IAM Role ARN for the service account with S3 access
+  labels: {}
+
+clusterRole:
+    labels: {}
+
+clusterRoleBinding:
+    labels: {}

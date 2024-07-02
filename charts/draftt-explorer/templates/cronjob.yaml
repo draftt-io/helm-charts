@@ -3,6 +3,12 @@ kind: CronJob
 metadata:
   name: {{ include "draftt-k8s-explorer.fullname" . }}
   namespace: {{ .Values.appConfig.namespace }}
+  labels:
+    {{- include "draftt-explorer.labels" . | nindent 4 }}
+    {{ if .Values.cronjob.labels }}
+      {{- toYaml .Values.cronjob.labels | nindent 4 }}
+    {{- end }}
+
 spec:
   schedule: "{{ .Values.cronjob.schedule }}"
   failedJobsHistoryLimit: {{ default 3 .Values.cronjob.failedJobsHistoryLimit }}
@@ -10,16 +16,25 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: {{ .Values.cronjob.maxRetries }}
+      {{- if .Values.cronjob.image.pullSecrets }}
+      imagePullSecrets:
+      {{- toYaml .Values.cronjob.image.pullSecrets | nindent 8 }}
+      {{- end }}
       template:
         metadata:
           labels:
-            app: {{ include "draftt-k8s-explorer.fullname" . }}
+            {{- include "draftt-explorer.labels" . | nindent 12 }}
+            {{- if .Values.cronjob.labels }}
+              {{- toYaml .Values.cronjob.labels | nindent 12 }}
+            {{- end }}
         spec:
           serviceAccountName: {{ .Values.serviceAccount.name }}
           containers:
           - name: draftt-k8s-explorerrer
             image: "{{ .Values.cronjob.image.repository }}:{{ .Values.cronjob.image.tag }}"
             imagePullPolicy: {{ .Values.cronjob.image.pullPolicy }}
+            resources:
+              {{- toYaml .Values.cronjob.resources | nindent 14 }}
             env:
               # Environment variables based on the appConfig
               - name: DRAFTT_COMPONENT_IDENTIFIER
@@ -56,9 +71,14 @@ spec:
                     key: "{{ .Values.appConfig.api.drafttApiToken.secretKey }}"
               {{- end }}
           restartPolicy: {{ default "OnFailure" .Values.cronjob.restartPolicy }}
-          {{- if .Values.cronjob.image.pullSecrets }}
-          imagePullSecrets:
-          {{- range .Values.cronjob.image.pullSecrets }}
-          - name: {{ . }}
+          {{- if .Values.cronjob.nodeSelector }}
+          nodeSelector: {{ .Values.cronjob.nodeSelector | toYaml | nindent 12 }}
           {{- end }}
+          {{- if .Values.cronjob.tolerations }}
+          tolerations:
+            {{- toYaml .Values.cronjob.tolerations | nindent 12 }}
+          {{- end }}
+          {{- if .Values.cronjob.affinity }}
+          affinity:
+            {{- toYaml .Values.cronjob.affinity | nindent 12 }}
           {{- end }}
