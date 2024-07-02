@@ -10,3 +10,16 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Common labels
+*/}}
+{{- define "draftt-explorer.labels" -}}
+helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+app.kubernetes.io/name: {{ include "draftt-k8s-explorer.fullname" . }}
+app.kubernetes.io/version: {{ .Chart.AppVersion }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+
