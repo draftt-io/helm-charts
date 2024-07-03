@@ -107,6 +107,12 @@ serviceAccount:
   annotations: {}
   # -- Labels to be added to service account
   labels: {}
-  # -- if `appConfig.s3Mode.enabled` is true, provide an AWS IAM Role ARN for the service account with S3 access.
-  roleArn: ""
+  annotations:
+    eks.amazonaws.com/role-arn: "test"
 
+clusterRole:
+  labels: {}
+  annotations: {}
+
+clusterRoleBinding:
+  labels: {}
