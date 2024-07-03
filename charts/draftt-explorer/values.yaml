@@ -14,6 +14,7 @@ cronjob:
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 3
   labels: {}
+  annotations: {}
   nodeSelector: {}
 
 
@@ -38,9 +39,11 @@ serviceAccount:
   name: draftt-explorer
   roleArn: ""  # AWS IAM Role ARN for the service account with S3 access
   labels: {}
+  annotations: {}
 
 clusterRole:
-    labels: {}
+  labels: {}
+  annotations: {}
 
 clusterRoleBinding:
-    labels: {}
+  labels: {}

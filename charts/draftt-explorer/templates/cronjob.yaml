@@ -8,7 +8,10 @@ metadata:
     {{ if .Values.cronjob.labels }}
       {{- toYaml .Values.cronjob.labels | nindent 4 }}
     {{- end }}
-
+  annotations:
+    {{- if .Values.cronjob.annotations }}
+      {{- toYaml .Values.cronjob.annotations | nindent 4 }}
+    {{- end }}
 spec:
   schedule: "{{ .Values.cronjob.schedule }}"
   failedJobsHistoryLimit: {{ default 3 .Values.cronjob.failedJobsHistoryLimit }}
@@ -26,6 +29,10 @@ spec:
             {{- include "draftt-explorer.labels" . | nindent 12 }}
             {{- if .Values.cronjob.labels }}
               {{- toYaml .Values.cronjob.labels | nindent 12 }}
+            {{- end }}
+          annotations:
+            {{- if .Values.cronjob.annotations }}
+              {{- toYaml .Values.cronjob.annotations | nindent 12 }}
             {{- end }}
         spec:
           serviceAccountName: {{ .Values.serviceAccount.name }}
