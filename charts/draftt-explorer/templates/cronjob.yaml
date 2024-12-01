@@ -45,7 +45,7 @@ spec:
             env:
               # Environment variables based on the appConfig
               - name: DRAFTT_COMPONENT_IDENTIFIER
-                value: "{{ .Values.appConfig.clusterIdentifier }}"
+                value: "{{ tpl .Values.appConfig.clusterIdentifier . }}"
               {{- if .Values.appConfig.aws.region }}
               - name: AWS_REGION
                 value: "{{ .Values.appConfig.aws.region }}"
@@ -69,7 +69,7 @@ spec:
               {{- if .Values.appConfig.api.drafttApiUrl }}
               - name: DRAFTT_API_ENDPOINT
                 value: "{{ .Values.appConfig.api.drafttApiUrl }}"
-              {{- end }}              
+              {{- end }}
               {{- if .Values.appConfig.api.drafttApiToken }}
               - name: DRAFTT_API_TOKEN
                 valueFrom:

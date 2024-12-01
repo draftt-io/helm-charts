@@ -1,7 +1,7 @@
 cronjob:
   schedule: "0 */8 * * *" # CronJob timing config, you can build it at: https://crontab.guru
   maxRetries: 3
-  restartPolicy: "OnFailure"  
+  restartPolicy: "OnFailure"
   image:
     repository: public.ecr.aws/draftt-io/draftt-explorer
     tag: 0.0.1
@@ -30,10 +30,10 @@ appConfig:
     secretAccessKey: ""
   api:
     drafttApiUrl: "https://api.draftt.io/component/k8s"
-    drafttApiToken: # You should Create a k8s generic secret 
+    drafttApiToken: # You should Create a k8s generic secret
       secretName: "draftt-api-token"
       secretKey: "drafttApiToken"
-      
+
 serviceAccount:
   create: true
   name: draftt-explorer
