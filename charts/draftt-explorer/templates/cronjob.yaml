@@ -19,10 +19,6 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: {{ .Values.cronjob.maxRetries }}
-      {{- if .Values.cronjob.image.pullSecrets }}
-      imagePullSecrets:
-      {{- toYaml .Values.cronjob.image.pullSecrets | nindent 8 }}
-      {{- end }}
       template:
         metadata:
           labels:
@@ -35,6 +31,10 @@ spec:
               {{- toYaml .Values.cronjob.annotations | nindent 12 }}
             {{- end }}
         spec:
+          {{- if .Values.cronjob.image.pullSecrets }}
+          imagePullSecrets:
+          {{- toYaml .Values.cronjob.image.pullSecrets | nindent 12 }}
+          {{- end }}
           serviceAccountName: {{ .Values.serviceAccount.name }}
           containers:
           - name: draftt-k8s-explorerrer
