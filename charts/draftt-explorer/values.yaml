@@ -1,26 +1,47 @@
+## Draftt explorer configuration
+
+## cronjob configuration
 cronjob:
-  schedule: "0 */8 * * *" # CronJob timing config, you can build it at: https://crontab.guru
+  # -- cronjob timing config, you can build it at: https://crontab.guru
+  schedule: "0 */8 * * *"
+  # -- the maximum number of retries for the cronjob before it is marked as failed
   maxRetries: 3
+  # -- The restart policy for the cronjob pod
   restartPolicy: "OnFailure"
+  ## Draftt explorer image
   image:
+    # -- Repository to use for the Draftt explorer
     repository: public.ecr.aws/draftt-io/draftt-explorer
+    # -- Tag to use for the Draftt explorer
     tag: 0.0.1
+    # -- Image pull policy to use for the Draftt explorer
     pullPolicy: Always
+    # -- Pull secrets to pull images from a private registry
     pullSecrets: []
-  resources: # per recommendations, we did not set resource limits by default, you can set it here
+  # -- Resource limits and requests for the draftt explorer pods
+  resources:
     requests:
       cpu: 100m
       memory: 256Mi
+  # -- The number of successful jobs to keep in the history. Older successful jobs beyond this limit are automatically deleted.
   successfulJobsHistoryLimit: 1
+  # -- The number of failed jobs to keep in the history. Older failed jobs beyond this limit are automatically deleted.
   failedJobsHistoryLimit: 3
+  # -- Labels to be added to the cronjob
   labels: {}
+  # -- Annotations to be added to the cronjob
   annotations: {}
+  # -- Node selector
   nodeSelector: {}
 
-
+## draftt explorer configuration
 appConfig:
-  namespace: monitoring # The namespace that resources will be deployed on
+  # -- The namespace that resources will be deployed on
+  namespace: monitoring
+  # -- The cluster identifier, you can get it from the cluster overview page in the draftt console.
+  # <br> **Note**: for the integration to work correctly, the exact cluster identifier must be provided.
   clusterIdentifier: ""
+  # -- S3 configuration
   s3:
     endpoint: ""
     bucketName: ""
@@ -28,22 +49,40 @@ appConfig:
     region: ""
     accessKeyId: ""
     secretAccessKey: ""
+  # draftt API configuration
   api:
+    # -- The draftt API URL
     drafttApiUrl: "https://api.draftt.io/component/k8s"
-    drafttApiToken: # You should Create a k8s generic secret
+    # -- The draftt API token secret.
+    # A k8s generic secret should be created according to the draftt integration setup instructions.
+    # <br> **Note**: Make sure the secret is created in the same namespace as the draftt explorer and the secret name and key are as specified in the values.yaml file.
+    drafttApiToken:
+      # -- The name of the secret
       secretName: "draftt-api-token"
+      # -- The key of the secret
       secretKey: "drafttApiToken"
 
+## service account configuration
 serviceAccount:
+  # -- Whether to create a service account
+  # <br> **Note**: if you are using an existing service account, set this to false and provide the service account name in the name field.
   create: true
+  # -- The name of the service account
   name: draftt-explorer
   roleArn: ""  # AWS IAM Role ARN for the service account with S3 access
+  # -- Labels to be added to service account
   labels: {}
+  # -- Annotations to be added to service account
   annotations: {}
 
+## cluster role configuration
 clusterRole:
+  # -- Labels to be added to cluster role
   labels: {}
+  # -- Annotations to be added to cluster role
   annotations: {}
 
+## cluster role binding configuration
 clusterRoleBinding:
+  # -- Labels to be added to cluster role binding
   labels: {}
