@@ -41,7 +41,7 @@ appConfig:
   # -- The cluster identifier, you can get it from the cluster overview page in the draftt console.
   # <br> **Note**: for the integration to work correctly, the exact cluster identifier must be provided.
   clusterIdentifier: ""
-  # -- S3 configuration
+  # -- S3 configuration for S3 mode
   s3:
     endpoint: ""
     bucketName: ""
@@ -69,7 +69,8 @@ serviceAccount:
   create: true
   # -- The name of the service account
   name: draftt-explorer
-  roleArn: ""  # AWS IAM Role ARN for the service account with S3 access
+  # -- for S3 mode - AWS IAM Role ARN for the service account with S3 access
+  roleArn: ""
   # -- Labels to be added to service account
   labels: {}
   # -- Annotations to be added to service account
