@@ -1,18 +1,24 @@
+{{- if .Values.rbac.create -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ .Values.serviceAccount.name }}-binding
-  namespace: {{ .Values.appConfig.namespace }}
+  name: {{ include "draftt-k8s-explorer.serviceAccountName" . }}-binding
+  namespace: {{ .Values.appConfig.namespace | default .Release.Namespace }}
   labels:
     {{- include "draftt-explorer.labels" . | nindent 4 }}
-    {{ if .Values.clusterRoleBinding.labels }}
-    {{- toYaml .Values.clusterRoleBinding.labels | nindent 4 }}
+    {{ if .Values.rbac.labels }}
+    {{- toYaml .Values.rbac.labels | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.rbac.annotations }}
+      {{- toYaml .Values.rbac.annotations | nindent 4 }}
     {{- end }}
 subjects:
 - kind: ServiceAccount
-  name: {{ .Values.serviceAccount.name }}
-  namespace: {{ .Values.appConfig.namespace }}
+  name: {{ include "draftt-k8s-explorer.serviceAccountName" . }}
+  namespace: {{ .Values.namespaceOverride | default .Release.Namespace }}
 roleRef:
   kind: ClusterRole
-  name: {{ .Values.serviceAccount.name }}-readonly
+  name: {{ include "draftt-k8s-explorer.serviceAccountName" . }}-readonly
   apiGroup: rbac.authorization.k8s.io
+{{- end -}}

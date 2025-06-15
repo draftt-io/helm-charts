@@ -1,28 +1,31 @@
 ## Draftt explorer configuration
 
-## cronjob configuration
+# -- Common labels to be added to all resources
+commonLabels: {}
+# -- Override the chart name
+nameOverride: ""
+
+## Draftt explorer image
+image:
+  # -- Repository to use for the Draftt explorer
+  repository: public.ecr.aws/draftt-io/draftt-explorer
+  # -- Tag to use for the Draftt explorer
+  tag: 0.0.1
+  # -- Image pull policy to use for the Draftt explorer
+  pullPolicy: Always
+  # -- Pull secrets to pull images from a private registry
+  pullSecrets: []
+
+## Draftt explorer cronjob configuration
 cronjob:
   # -- cronjob timing config, you can build it at: https://crontab.guru
+  # <br> **Note**: Retaining the default value of every 8 hours is advised for best performance. 
+  # Can be adjusted if needed.
   schedule: "0 */8 * * *"
   # -- the maximum number of retries for the cronjob before it is marked as failed
   maxRetries: 3
   # -- The restart policy for the cronjob pod
   restartPolicy: "OnFailure"
-  ## Draftt explorer image
-  image:
-    # -- Repository to use for the Draftt explorer
-    repository: public.ecr.aws/draftt-io/draftt-explorer
-    # -- Tag to use for the Draftt explorer
-    tag: 0.0.1
-    # -- Image pull policy to use for the Draftt explorer
-    pullPolicy: Always
-    # -- Pull secrets to pull images from a private registry
-    pullSecrets: []
-  # -- Resource limits and requests for the draftt explorer pods
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
   # -- The number of successful jobs to keep in the history. Older successful jobs beyond this limit are automatically deleted.
   successfulJobsHistoryLimit: 1
   # -- The number of failed jobs to keep in the history. Older failed jobs beyond this limit are automatically deleted.
@@ -31,25 +34,43 @@ cronjob:
   labels: {}
   # -- Annotations to be added to the cronjob
   annotations: {}
-  # -- Node selector
+  # -- Node selector for the cronjob
   nodeSelector: {}
+  # -- Tolerations for the cronjob
+  tolerations: []
+  # -- Affinity for the cronjob
+  affinity: {}
 
-## draftt explorer configuration
+## Resources configuration
+resources:
+  # -- Resource requests for the draftt explorer
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  
+## Draftt explorer configuration
 appConfig:
-  # -- The namespace that resources will be deployed on
-  namespace: monitoring
+  # -- The namespace that all resources will be deployed on
+  # @default -- `.Release.Namespace`
+  namespace: ""
   # -- The cluster identifier, you can get it from the cluster overview page in the draftt console.
   # <br> **Note**: for the integration to work correctly, the exact cluster identifier must be provided.
   clusterIdentifier: ""
-  # -- S3 configuration for S3 mode
-  s3:
+  ## S3 mode configuration
+  s3Mode:
+    # -- Whether to enable S3 mode
+    enabled: false
+    # -- The S3 endpoint
     endpoint: ""
+    # -- The S3 bucket name
     bucketName: ""
-  aws:
+    # -- The AWS region
     region: ""
+    # -- The AWS access key ID
     accessKeyId: ""
+    # -- The AWS secret access key
     secretAccessKey: ""
-  # draftt API configuration
+  ## Draftt API configuration
   api:
     # -- The draftt API URL
     drafttApiUrl: "https://api.draftt.io/component/k8s"
@@ -62,28 +83,30 @@ appConfig:
       # -- The key of the secret
       secretKey: "drafttApiToken"
 
-## service account configuration
+## RBAC configuration
+rbac:
+  # -- Whether to create rbac resources
+  # <br> **Note**: When set to true, the following rbac resources will be created:
+  # <br>- cluster role
+  # <br>- cluster role binding
+  create: true
+  # -- Labels to be added to rbac resources
+  labels: {}
+  # -- Annotations to be added to rbac resources
+  annotations: {}
+
+## Service account configuration
 serviceAccount:
-  # -- Whether to create a service account
+  # -- Whether to create a service account.
   # <br> **Note**: if you are using an existing service account, set this to false and provide the service account name in the name field.
   create: true
-  # -- The name of the service account
-  name: draftt-explorer
-  # -- for S3 mode - AWS IAM Role ARN for the service account with S3 access
-  roleArn: ""
-  # -- Labels to be added to service account
-  labels: {}
+  # -- The name of the service account.
+  # <br> If not set, and `serviceAccount.create` is true, a service account is created automatically using the fullname template.
+  name: ""
   # -- Annotations to be added to service account
   annotations: {}
-
-## cluster role configuration
-clusterRole:
-  # -- Labels to be added to cluster role
+  # -- Labels to be added to service account
   labels: {}
-  # -- Annotations to be added to cluster role
-  annotations: {}
+  # -- if `appConfig.s3Mode.enabled` is true, provide an AWS IAM Role ARN for the service account with S3 access.
+  roleArn: ""
 
-## cluster role binding configuration
-clusterRoleBinding:
-  # -- Labels to be added to cluster role binding
-  labels: {}

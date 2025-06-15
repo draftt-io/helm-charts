@@ -1,17 +1,19 @@
+{{- if .Values.rbac.create -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ .Values.serviceAccount.name }}-readonly
+  name: {{ include "draftt-k8s-explorer.serviceAccountName" . }}-readonly
   labels:
     {{- include "draftt-explorer.labels" . | nindent 4 }}
-    {{ if .Values.clusterRole.labels }}
-    {{- toYaml .Values.clusterRole.labels | nindent 4 }}
+    {{ if .Values.rbac.labels }}
+    {{- toYaml .Values.rbac.labels | nindent 4 }}
     {{- end }}
   annotations:
-    {{- if .Values.clusterRole.annotations }}
-      {{- toYaml .Values.clusterRole.annotations | nindent 4 }}
+    {{- if .Values.rbac.annotations }}
+      {{- toYaml .Values.rbac.annotations | nindent 4 }}
     {{- end }}
 rules:
 - apiGroups: ["*"] # A wildcard to include all API groups
   resources: ["*"] # A wildcard to include all resources
   verbs: ["get", "list", "watch"]  # read only access
+{{- end -}}
