@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ include "draftt-k8s-explorer.fullname" . }}
-  namespace: {{ .Values.appConfig.namespace }}
+  namespace: {{ .Values.appConfig.namespace | default .Release.Namespace }}
   labels:
     {{- include "draftt-explorer.labels" . | nindent 4 }}
     {{ if .Values.cronjob.labels }}
@@ -31,41 +31,21 @@ spec:
               {{- toYaml .Values.cronjob.annotations | nindent 12 }}
             {{- end }}
         spec:
-          {{- if .Values.cronjob.image.pullSecrets }}
+          {{- if .Values.image.pullSecrets }}
           imagePullSecrets:
-          {{- toYaml .Values.cronjob.image.pullSecrets | nindent 12 }}
+          {{- toYaml .Values.image.pullSecrets | nindent 12 }}
           {{- end }}
-          serviceAccountName: {{ .Values.serviceAccount.name }}
+          serviceAccountName: {{ include "draftt-k8s-explorer.serviceAccountName" . }}
           containers:
-          - name: draftt-k8s-explorerrer
-            image: "{{ .Values.cronjob.image.repository }}:{{ .Values.cronjob.image.tag }}"
-            imagePullPolicy: {{ .Values.cronjob.image.pullPolicy }}
+          - name: draftt-k8s-explorer
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
             resources:
-              {{- toYaml .Values.cronjob.resources | nindent 14 }}
+              {{- toYaml .Values.resources | nindent 14 }}
             env:
               # Environment variables based on the appConfig
               - name: DRAFTT_COMPONENT_IDENTIFIER
                 value: "{{ tpl .Values.appConfig.clusterIdentifier . }}"
-              {{- if .Values.appConfig.aws.region }}
-              - name: AWS_REGION
-                value: "{{ .Values.appConfig.aws.region }}"
-              {{- end }}
-              {{- if .Values.appConfig.aws.accessKeyId }}
-              - name: AWS_ACCESS_KEY_ID
-                value: "{{ .Values.appConfig.aws.accessKeyId }}"
-              {{- end }}
-              {{- if .Values.appConfig.aws.secretAccessKey }}
-              - name: AWS_SECRET_ACCESS_KEY
-                value: "{{ .Values.appConfig.aws.secretAccessKey }}"
-              {{- end }}
-              {{- if .Values.appConfig.s3.bucketName }}
-              - name: S3_BUCKET_NAME
-                value: "{{ .Values.appConfig.s3.bucketName }}"
-              {{- end }}
-              {{- if and .Values.appConfig.s3.endpoint (not (eq .Values.appConfig.s3.endpoint "")) }}
-              - name: S3_ENDPOINT
-                value: "{{ .Values.appConfig.s3.endpoint }}"
-              {{- end }}
               {{- if .Values.appConfig.api.drafttApiUrl }}
               - name: DRAFTT_API_ENDPOINT
                 value: "{{ .Values.appConfig.api.drafttApiUrl }}"
@@ -76,6 +56,28 @@ spec:
                   secretKeyRef:
                     name: "{{ .Values.appConfig.api.drafttApiToken.secretName }}"
                     key: "{{ .Values.appConfig.api.drafttApiToken.secretKey }}"
+              {{- end }}
+              {{- if .Values.appConfig.s3Mode.enabled }}
+              {{- if .Values.appConfig.s3Mode.region }}
+              - name: AWS_REGION
+                value: "{{ .Values.appConfig.s3Mode.region }}"
+              {{- end }}
+              {{- if .Values.appConfig.s3Mode.accessKeyId }}
+              - name: AWS_ACCESS_KEY_ID
+                value: "{{ .Values.appConfig.s3Mode.accessKeyId }}"
+              {{- end }}
+              {{- if .Values.appConfig.s3Mode.secretAccessKey }}
+              - name: AWS_SECRET_ACCESS_KEY
+                value: "{{ .Values.appConfig.s3Mode.secretAccessKey }}"
+              {{- end }}
+              {{- if .Values.appConfig.s3Mode.bucketName }}
+              - name: S3_BUCKET_NAME
+                value: "{{ .Values.appConfig.s3Mode.bucketName }}"
+              {{- end }}
+              {{- if and .Values.appConfig.s3Mode.endpoint (not (eq .Values.appConfig.s3Mode.endpoint "")) }}
+              - name: S3_ENDPOINT
+                value: "{{ .Values.appConfig.s3Mode.endpoint }}"
+              {{- end }}
               {{- end }}
           restartPolicy: {{ default "OnFailure" .Values.cronjob.restartPolicy }}
           {{- if .Values.cronjob.nodeSelector }}

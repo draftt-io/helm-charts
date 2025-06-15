@@ -20,6 +20,15 @@ app.kubernetes.io/name: {{ include "draftt-k8s-explorer.fullname" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- with .Values.commonLabels }}
+{{ toYaml . }}
+{{- end }}
 {{- end -}}
 
+{{/*
+The name of the service account to use
+*/}}
+{{- define "draftt-k8s-explorer.serviceAccountName" -}}
+{{- default (include "draftt-k8s-explorer.fullname" .) .Values.serviceAccount.name -}}
+{{- end -}}
 
