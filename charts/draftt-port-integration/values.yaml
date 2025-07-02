@@ -1,0 +1,33 @@
+cronjob:
+  schedule: "0 */8 * * *" # CronJob timing config, you can build it at: https://crontab.guru
+  maxRetries: 3
+  restartPolicy: "OnFailure"  
+  image:
+    repository: 730335423362.dkr.ecr.us-east-1.amazonaws.com/draftt/port-integration
+    tag: 0.0.1
+    pullPolicy: Always
+    pullSecrets: []
+  resources: # per recommendations, we did not set resource limits by default, you can set it here
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  labels: {}
+  annotations: {}
+  nodeSelector: {}
+
+appConfig:
+  namespace: monitoring # The namespace that resources will be deployed on
+  port:
+    clientId: ""
+    clientSecret: ""
+    baseUrl: "https://api.getport.io"
+    eventListenerType: "POLLING"
+    initializePortResources: "true"
+  integration:
+    identifier: "draftt-io"
+  draftt:
+    drafttApiToken:
+      secretName: "draftt-api-token"
+      secretKey: "drafttApiToken"
