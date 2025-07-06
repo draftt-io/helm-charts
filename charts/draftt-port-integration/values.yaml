@@ -1,7 +1,5 @@
-cronjob:
-  schedule: "0 */8 * * *" # CronJob timing config, you can build it at: https://crontab.guru
-  maxRetries: 3
-  restartPolicy: "OnFailure"  
+deployment:
+  restartPolicy: "Always"  
   image:
     repository: 730335423362.dkr.ecr.us-east-1.amazonaws.com/draftt/port-integration
     tag: 0.0.1
@@ -11,8 +9,6 @@ cronjob:
     requests:
       cpu: 100m
       memory: 256Mi
-  successfulJobsHistoryLimit: 1
-  failedJobsHistoryLimit: 3
   labels: {}
   annotations: {}
   nodeSelector: {}
@@ -29,5 +25,13 @@ appConfig:
     identifier: "draftt-io"
   draftt:
     drafttApiToken:
-      secretName: "draftt-api-token"
+      secretName: "draftt-port-integration"
       secretKey: "drafttApiToken"
+  port:
+    portClientId:
+      secretName: "draftt-port-integration"
+      secretKey: "portClientId"
+    portClientSecret:
+      secretName: "draftt-port-integration"
+      secretKey: "portClientSecret"
+    
