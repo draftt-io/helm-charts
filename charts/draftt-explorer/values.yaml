@@ -107,8 +107,6 @@ serviceAccount:
   annotations: {}
   # -- Labels to be added to service account
   labels: {}
-  annotations:
-    eks.amazonaws.com/role-arn: "test"
 
 clusterRole:
   labels: {}
