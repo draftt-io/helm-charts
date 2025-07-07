@@ -1,0 +1,5 @@
+apiVersion: v2
+name: draftt-port-integration
+description: A Helm chart for Draftt - Port.io integration
+version: 0.1.0
+appVersion: "0.0.1"

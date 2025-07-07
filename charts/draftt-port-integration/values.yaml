@@ -1,0 +1,72 @@
+## Draftt port integration configuration
+
+# -- Common labels to be added to all resources
+commonLabels: {}
+# -- Override the chart name
+nameOverride: ""
+
+## Draftt port integration image
+image:
+  # -- Repository to use for the Draftt port integration
+  repository: public.ecr.aws/draftt-io/draftt-port-integration
+  # -- Tag to use for the Draftt port integration
+  tag: 0.0.1
+  # -- Image pull policy to use for the Draftt port integration
+  pullPolicy: Always
+  # -- Pull secrets to pull images from a private registry
+  pullSecrets: []
+
+## Draftt port integration deployment configuration
+deployment:
+  # -- The restart policy for the deployment pod
+  restartPolicy: "Always"
+  # -- Labels to be added to the deployment
+  labels: {}
+  # -- Annotations to be added to the deployment
+  annotations: {}
+  # -- Node selector for the deployment
+  nodeSelector: {}
+  # -- Tolerations for the deployment
+  tolerations: []
+  # -- Affinity for the deployment
+  affinity: {}
+  # -- Resources configuration
+  resources:
+    # -- Resource requests for the deployment
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  
+## Draftt port integration app configuration
+appConfig:
+  # -- The namespace that all resources will be deployed on
+  namespace: "monitoring"
+  ## Draftt port integration API configuration
+  draftt:
+    # -- The draftt API URL
+    drafttApiUrl: "https://api.draftt.io/v1"
+    # -- The draftt API token secret.
+    # A k8s generic secret should be created according to the draftt port integration setup instructions.
+    # <br> **Note**: Make sure the secret is created in the same namespace as the draftt port integration and the secret name and key are as specified in the values.yaml file.
+    drafttApiToken:
+      # -- The name of the secret
+      secretName: "draftt-port-integration"
+      # -- The key of the secret
+      secretKey: "drafttApiToken"
+  port:
+    # -- The port.io base URL
+    baseUrl: "https://api.getport.io"
+    # -- The port.io event listener type
+    eventListenerType: "POLLING"
+    # -- Whether to initialize port.io resources
+    initializePortResources: "true"
+    # -- The port.io client ID secret
+    portClientId:
+      secretName: "draftt-port-integration"
+      secretKey: "portClientId"
+    # -- The port.io client secret
+    portClientSecret:
+      secretName: "draftt-port-integration"
+      secretKey: "portClientSecret"
+    # -- The draftt port integration identifier
+    identifier: "draftt-io"
