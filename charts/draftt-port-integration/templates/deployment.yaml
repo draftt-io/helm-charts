@@ -42,9 +42,15 @@ spec:
           {{- toYaml .Values.deployment.resources | nindent 10 }}
         env:
           - name: OCEAN__PORT__CLIENT_ID
-            value: "{{ .Values.appConfig.port.clientId }}"
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Values.appConfig.port.portClientId.secretName }}"
+                key: "{{ .Values.appConfig.port.portClientId.secretKey }}"
           - name: OCEAN__PORT__CLIENT_SECRET
-            value: "{{ .Values.appConfig.port.clientSecret }}"
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Values.appConfig.port.portClientSecret.secretName }}"
+                key: "{{ .Values.appConfig.port.portClientSecret.secretKey }}"
           - name: OCEAN__PORT__BASE_URL
             value: "{{ .Values.appConfig.port.baseUrl }}"
           - name: OCEAN__INTEGRATION__IDENTIFIER
@@ -53,13 +59,11 @@ spec:
             value: "{{ .Values.appConfig.port.eventListenerType }}"
           - name: OCEAN__INITIALIZE_PORT_RESOURCES
             value: "{{ .Values.appConfig.port.initializePortResources }}"
-          {{- if .Values.appConfig.draftt.drafttApiToken }}
           - name: OCEAN__INTEGRATION__CONFIG__DRAFTT_API_TOKEN
             valueFrom:
               secretKeyRef:
                 name: "{{ .Values.appConfig.draftt.drafttApiToken.secretName }}"
                 key: "{{ .Values.appConfig.draftt.drafttApiToken.secretKey }}"
-          {{- end }}
       restartPolicy: {{ default "Always" .Values.deployment.restartPolicy }}
       {{- if .Values.deployment.nodeSelector }}
       nodeSelector: {{ .Values.deployment.nodeSelector | toYaml | nindent 8 }}

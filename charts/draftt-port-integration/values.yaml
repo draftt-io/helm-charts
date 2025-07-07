@@ -1,7 +1,7 @@
 deployment:
   restartPolicy: "Always"  
   image:
-    repository: 730335423362.dkr.ecr.us-east-1.amazonaws.com/draftt/port-integration
+    repository: public.ecr.aws/draftt-io/draftt-port-integration
     tag: 0.0.1
     pullPolicy: Always
     pullSecrets: []
@@ -16,22 +16,19 @@ deployment:
 appConfig:
   namespace: monitoring # The namespace that resources will be deployed on
   port:
-    clientId: ""
-    clientSecret: ""
     baseUrl: "https://api.getport.io"
     eventListenerType: "POLLING"
     initializePortResources: "true"
-  integration:
-    identifier: "draftt-io"
-  draftt:
-    drafttApiToken:
-      secretName: "draftt-port-integration"
-      secretKey: "drafttApiToken"
-  port:
     portClientId:
       secretName: "draftt-port-integration"
       secretKey: "portClientId"
     portClientSecret:
       secretName: "draftt-port-integration"
       secretKey: "portClientSecret"
+  integration:
+    identifier: "draftt-io"
+  draftt:
+    drafttApiToken:
+      secretName: "draftt-port-integration"
+      secretKey: "drafttApiToken"
     
