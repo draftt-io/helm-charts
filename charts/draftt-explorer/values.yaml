@@ -19,9 +19,9 @@ image:
 ## Draftt explorer cronjob configuration
 cronjob:
   # -- cronjob timing config, you can build it at: https://crontab.guru
-  # <br> **Note**: Retaining the default value of every 8 hours is advised for best performance. 
+  # <br> **Note**: Retaining the default value of every 7 and 30 minutes is advised for best performance. 
   # Can be adjusted if needed.
-  schedule: "0 */8 * * *"
+  schedule: "30 */7 * * *"
   # -- the maximum number of retries for the cronjob before it is marked as failed
   maxRetries: 3
   # -- The restart policy for the cronjob pod
@@ -45,8 +45,8 @@ cronjob:
 resources:
   # -- Resource requests for the draftt explorer
   requests:
-    cpu: 100m
-    memory: 256Mi
+    cpu: 2
+    memory: 2Gi
   
 ## Draftt explorer configuration
 appConfig:
