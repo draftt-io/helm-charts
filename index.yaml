@@ -3,6 +3,15 @@ entries:
   draftt-explorer:
   - apiVersion: v2
     appVersion: 0.0.1
+    created: "2025-08-10T21:29:48.841854317Z"
+    description: A Helm chart for Draftt k8s explorer
+    digest: 5d503f98ca879c7f134ea25eeb72f0774875454bcbd671febb45d4945b16e557
+    name: draftt-explorer
+    urls:
+    - https://github.com/draftt-io/helm-charts/releases/download/draftt-explorer-0.1.8/draftt-explorer-0.1.8.tgz
+    version: 0.1.8
+  - apiVersion: v2
+    appVersion: 0.0.1
     created: "2025-06-16T12:31:52.77381883Z"
     description: A Helm chart for Draftt k8s explorer
     digest: 329fbd9adbca4e561742322cc7fdb36f4a3dac6d84349b51dd6085f4460dcf93
@@ -83,4 +92,4 @@ entries:
     urls:
     - https://github.com/draftt-io/helm-charts/releases/download/draftt-port-integration-0.1.0/draftt-port-integration-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-07T10:45:57.102665876Z"
+generated: "2025-08-10T21:29:48.841887299Z"
