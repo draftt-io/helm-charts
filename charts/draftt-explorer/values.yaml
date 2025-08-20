@@ -44,9 +44,14 @@ cronjob:
 ## Resources configuration
 resources:
   # -- Resource requests for the draftt explorer
+  # <br> **Note**: The default is for small-medium sized clusters. For large clusters, you may need to increase the resources.
+  # <br> **Note**: Our recommendations for big clusters (1000+ deployments) are:
+  # requests:
+  #   cpu: 2
+  #   memory: 2Gi
   requests:
-    cpu: 2
-    memory: 2Gi
+    cpu: 100m
+    memory: 0.5Gi
   
 ## Draftt explorer configuration
 appConfig:
