@@ -76,7 +76,7 @@ appConfig:
     # both - output the data to both stdout and configmap
     # <br> **Note**: Apply only if `localMode.enabled` is true.
     # @default -- "stdout"
-    outputType: ""
+    outputType: "stdout"
   ## Draftt API configuration
   api:
     # -- Whether to enable API mode
