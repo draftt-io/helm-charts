@@ -19,6 +19,7 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: {{ .Values.cronjob.maxRetries }}
+      ttlSecondsAfterFinished: {{ default 3600 .Values.cronjob.ttlSecondsAfterFinished }}
       template:
         metadata:
           labels:
@@ -46,6 +47,9 @@ spec:
               # Environment variables based on the appConfig
               - name: DRAFTT_COMPONENT_IDENTIFIER
                 value: "{{ tpl .Values.appConfig.clusterIdentifier . }}"
+              {{- if .Values.appConfig.api.enabled }}
+              - name: MODE
+                value: "api"
               {{- if .Values.appConfig.api.drafttApiUrl }}
               - name: DRAFTT_API_ENDPOINT
                 value: "{{ .Values.appConfig.api.drafttApiUrl }}"
@@ -57,26 +61,13 @@ spec:
                     name: "{{ .Values.appConfig.api.drafttApiToken.secretName }}"
                     key: "{{ .Values.appConfig.api.drafttApiToken.secretKey }}"
               {{- end }}
-              {{- if .Values.appConfig.s3Mode.enabled }}
-              {{- if .Values.appConfig.s3Mode.region }}
-              - name: AWS_REGION
-                value: "{{ .Values.appConfig.s3Mode.region }}"
               {{- end }}
-              {{- if .Values.appConfig.s3Mode.accessKeyId }}
-              - name: AWS_ACCESS_KEY_ID
-                value: "{{ .Values.appConfig.s3Mode.accessKeyId }}"
-              {{- end }}
-              {{- if .Values.appConfig.s3Mode.secretAccessKey }}
-              - name: AWS_SECRET_ACCESS_KEY
-                value: "{{ .Values.appConfig.s3Mode.secretAccessKey }}"
-              {{- end }}
-              {{- if .Values.appConfig.s3Mode.bucketName }}
-              - name: S3_BUCKET_NAME
-                value: "{{ .Values.appConfig.s3Mode.bucketName }}"
-              {{- end }}
-              {{- if and .Values.appConfig.s3Mode.endpoint (not (eq .Values.appConfig.s3Mode.endpoint "")) }}
-              - name: S3_ENDPOINT
-                value: "{{ .Values.appConfig.s3Mode.endpoint }}"
+              {{- if and .Values.appConfig.localMode.enabled (not .Values.appConfig.api.enabled) }}
+              - name: MODE
+                value: "local"
+              {{- if .Values.appConfig.localMode.outputType }}
+              - name: LOCAL_OUTPUT_MODE
+                value: "{{ .Values.appConfig.localMode.outputType }}"
               {{- end }}
               {{- end }}
           restartPolicy: {{ default "OnFailure" .Values.cronjob.restartPolicy }}
