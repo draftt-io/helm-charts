@@ -16,4 +16,9 @@ rules:
 - apiGroups: ["*"] # A wildcard to include all API groups
   resources: ["*"] # A wildcard to include all resources
   verbs: ["get", "list", "watch"]  # read only access
+{{- if and .Values.appConfig.localMode.enabled (eq .Values.appConfig.localMode.outputType "configmap" | or (eq .Values.appConfig.localMode.outputType "both")) }}
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "create", "update"]
+{{- end }}
 {{- end -}}

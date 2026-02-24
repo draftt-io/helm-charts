@@ -30,6 +30,10 @@ cronjob:
   successfulJobsHistoryLimit: 1
   # -- The number of failed jobs to keep in the history. Older failed jobs beyond this limit are automatically deleted.
   failedJobsHistoryLimit: 3
+  # -- The TTL for the cronjob pod after it is finished.
+  # <br> **Note**: The default value is 3600 seconds (1 hour).
+  # @default -- 3600
+  ttlSecondsAfterFinished: 3600
   # -- Labels to be added to the cronjob
   labels: {}
   # -- Annotations to be added to the cronjob
@@ -56,22 +60,29 @@ appConfig:
   # -- The cluster identifier, you can get it from the cluster overview page in the draftt console.
   # <br> **Note**: for the integration to work correctly, the exact cluster identifier must be provided.
   clusterIdentifier: ""
-  ## S3 mode configuration
-  s3Mode:
-    # -- Whether to enable S3 mode
+  ## Local mode configuration
+  localMode:
+    # -- Whether to enable local mode
+    # @default -- false
     enabled: false
-    # -- The S3 endpoint
-    endpoint: ""
-    # -- The S3 bucket name
-    bucketName: ""
-    # -- The AWS region
-    region: ""
-    # -- The AWS access key ID
-    accessKeyId: ""
-    # -- The AWS secret access key
-    secretAccessKey: ""
+    # -- Local mode output type
+    # -- Available options: "stdout" | "configmap" | "both"
+    # configmap - output the data to the `draftt-k8s-report` ConfigMap in the namespace the draftt explorer is deployed in
+    # <br> To retrieve the data, run:
+    # <br> `kubectl get configmap draftt-k8s-report -n <namespace> -o jsonpath='{.data.report.json}'`
+    # stdout - output the data to job's pod logs
+    # <br> To retrieve the data, run:
+    # <br> `kubectl logs <job-name> -n <namespace>`
+    # both - output the data to both stdout and configmap
+    # <br> **Note**: Apply only if `localMode.enabled` is true.
+    # @default -- "stdout"
+    outputType: ""
   ## Draftt API configuration
   api:
+    # -- Whether to enable API mode
+    # <br> **Note**: If `localMode.enabled` is enabled, set this to false. Otherwise, API mode will override local mode.
+    # @default -- true
+    enabled: true
     # -- The draftt API URL
     drafttApiUrl: "https://api.draftt.io/component/k8s"
     # -- The draftt API token secret.
@@ -86,9 +97,8 @@ appConfig:
 ## RBAC configuration
 rbac:
   # -- Whether to create rbac resources
-  # <br> **Note**: When set to true, the following rbac resources will be created:
-  # <br>- cluster role
-  # <br>- cluster role binding
+  # <br> **Note**: When set to true, the required rbac resources will be created according to the run mode.
+  # <br> When set to false, a cluster role and a cluster role binding should be created manually according to the run mode.
   create: true
   # -- Labels to be added to rbac resources
   labels: {}
