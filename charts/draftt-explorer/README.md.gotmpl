@@ -32,11 +32,14 @@ Local mode is used to output the data to the console.
 It can be configured to output the data to one or both of the following:
 - **configmap** - `draftt-k8s-report` ConfigMap in the namespace the draftt explorer is deployed in. To retrieve the data, run:
 ```bash
-kubectl get configmap draftt-k8s-report -n <namespace> -o jsonpath='{.data.report.json}'
+kubectl get configmap draftt-k8s-report -n <namespace> -o jsonpath='{.data.report\.json}'
 ```
 - **stdout** - job's pod logs. To retrieve the data, run:
 ```bash
 kubectl logs <job-name> -n <namespace>
 ```
+**Note**: When using `stdout` output type, pod logs may become unavailable after job                                                             
+  completion due to pod eviction, node termination, or resource cleanup. For reliable                                                              
+  data persistence, use `configmap` or `both` output type.
 
 {{ template "chart.valuesSection" . }}
