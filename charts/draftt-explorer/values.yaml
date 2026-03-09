@@ -49,8 +49,8 @@ cronjob:
 resources:
   # -- Resource requests for the draftt explorer
   requests:
-    cpu: 2
-    memory: 2Gi
+    cpu: 500m
+    memory: 512Mi
 
 ## Draftt explorer configuration
 appConfig:
