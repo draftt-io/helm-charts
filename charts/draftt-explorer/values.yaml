@@ -19,7 +19,7 @@ image:
 ## Draftt explorer cronjob configuration
 cronjob:
   # -- cronjob timing config, you can build it at: https://crontab.guru
-  # <br> **Note**: Retaining the default value of every 7 and 30 minutes is advised for best performance. 
+  # <br> **Note**: Retaining the default value of every 7 and 30 minutes is advised for best performance.
   # Can be adjusted if needed.
   schedule: "30 */7 * * *"
   # -- the maximum number of retries for the cronjob before it is marked as failed
@@ -51,7 +51,7 @@ resources:
   requests:
     cpu: 2
     memory: 2Gi
-  
+
 ## Draftt explorer configuration
 appConfig:
   # -- The namespace that all resources will be deployed on
@@ -93,6 +93,10 @@ appConfig:
       secretName: "draftt-api-token"
       # -- The key of the secret
       secretKey: "drafttApiToken"
+  # -- The log level to use for the draftt explorer
+  # @default -- "info"
+  # Available options: "debug" | "info" | "warn" | "error"
+  logLevel: "info"
 
 ## RBAC configuration
 rbac:
@@ -117,6 +121,3 @@ serviceAccount:
   annotations: {}
   # -- Labels to be added to service account
   labels: {}
-  # -- if `appConfig.s3Mode.enabled` is true, provide an AWS IAM Role ARN for the service account with S3 access.
-  roleArn: ""
-
