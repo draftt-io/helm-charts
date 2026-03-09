@@ -77,7 +77,7 @@ kubectl logs <job-name> -n <namespace>
 | rbac.annotations | object | `{}` | Annotations to be added to rbac resources |
 | rbac.create | bool | `true` | Whether to create rbac resources <br> **Note**: When set to true, the required rbac resources will be created according to the run mode. <br> When set to false, a cluster role and a cluster role binding should be created manually according to the run mode. |
 | rbac.labels | object | `{}` | Labels to be added to rbac resources |
-| resources.requests | object | `{"cpu":2,"memory":"2Gi"}` | Resource requests for the draftt explorer |
+| resources.requests | object | `{"cpu":"500m","memory":"512Mi"}` | Resource requests for the draftt explorer |
 | serviceAccount.annotations | object | `{}` | Annotations to be added to service account |
 | serviceAccount.create | bool | `true` | Whether to create a service account. <br> **Note**: if you are using an existing service account, set this to false and provide the service account name in the name field. |
 | serviceAccount.labels | object | `{}` | Labels to be added to service account |
