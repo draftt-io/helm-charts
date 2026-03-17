@@ -54,8 +54,8 @@ kubectl logs <job-name> -n <namespace>
 | appConfig.api.enabled | bool | true | Whether to enable API mode <br> **Note**: If `localMode.enabled` is enabled, set this to false. Otherwise, API mode will override local mode. |
 | appConfig.clusterIdentifier | string | `""` | The cluster identifier, you can get it from the cluster overview page in the draftt console. <br> **Note**: for the integration to work correctly, the exact cluster identifier must be provided. |
 | appConfig.localMode.enabled | bool | false | Whether to enable local mode |
-| appConfig.localMode.outputType | string | "stdout" | Available options: "stdout" | "configmap" | "both" configmap - output the data to the `draftt-k8s-report` ConfigMap in the namespace the draftt explorer is deployed in <br> To retrieve the data, run: <br> `kubectl get configmap draftt-k8s-report -n <namespace> -o jsonpath='{.data.report.json}'` stdout - output the data to job's pod logs <br> To retrieve the data, run: <br> `kubectl logs <job-name> -n <namespace>` both - output the data to both stdout and configmap <br> **Note**: Apply only if `localMode.enabled` is true. |
-| appConfig.logLevel | string | "info" | The log level to use for the draftt explorer Available options: "debug" | "info" | "warn" | "error" |
+| appConfig.localMode.outputType | string | "stdout" | Available options: "stdout" \| "configmap" \| "both" configmap - output the data to the `draftt-k8s-report` ConfigMap in the namespace the draftt explorer is deployed in <br> To retrieve the data, run: <br> `kubectl get configmap draftt-k8s-report -n <namespace> -o jsonpath='{.data.report.json}'` stdout - output the data to job's pod logs <br> To retrieve the data, run: <br> `kubectl logs <job-name> -n <namespace>` both - output the data to both stdout and configmap <br> **Note**: Apply only if `localMode.enabled` is true. |
+| appConfig.logLevel | string | "info" | The log level to use for the draftt explorer Available options: "debug" \| "info" \| "warn" \| "error" |
 | appConfig.namespace | string | `.Release.Namespace` | The namespace that all resources will be deployed on |
 | commonLabels | object | `{}` | Common labels to be added to all resources |
 | cronjob.affinity | object | `{}` | Affinity for the cronjob |
@@ -65,7 +65,7 @@ kubectl logs <job-name> -n <namespace>
 | cronjob.maxRetries | int | `3` | the maximum number of retries for the cronjob before it is marked as failed |
 | cronjob.nodeSelector | object | `{}` | Node selector for the cronjob |
 | cronjob.restartPolicy | string | `"OnFailure"` | The restart policy for the cronjob pod |
-| cronjob.schedule | string | `"30 */7 * * *"` | cronjob timing config, you can build it at: https://crontab.guru <br> **Note**: Retaining the default value of every 7 and 30 minutes is advised for best performance. Can be adjusted if needed. |
+| cronjob.schedule | string | `"30 */7 * * *"` | cronjob timing config, you can build it at: https://crontab.guru <br> **Note**: Retaining the default value (every 7 hours at :30) is advised for best performance. Can be adjusted if needed. |
 | cronjob.successfulJobsHistoryLimit | int | `1` | The number of successful jobs to keep in the history. Older successful jobs beyond this limit are automatically deleted. |
 | cronjob.tolerations | list | `[]` | Tolerations for the cronjob |
 | cronjob.ttlSecondsAfterFinished | int | 3600 | The TTL for the cronjob pod after it is finished. <br> **Note**: The default value is 3600 seconds (1 hour). |
