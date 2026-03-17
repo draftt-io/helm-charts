@@ -1,0 +1,24 @@
+{{- if and .Values.rbac.create .Values.appConfig.localMode.enabled (not .Values.appConfig.api.enabled) (or (eq .Values.appConfig.localMode.outputType "configmap") (eq .Values.appConfig.localMode.outputType "both")) -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "draftt-k8s-explorer.serviceAccountName" . }}-configmap-writer-binding
+  namespace: {{ .Values.appConfig.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "draftt-explorer.labels" . | nindent 4 }}
+    {{- if .Values.rbac.labels }}
+    {{- toYaml .Values.rbac.labels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.rbac.annotations }}
+  annotations:
+    {{- toYaml .Values.rbac.annotations | nindent 4 }}
+  {{- end }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "draftt-k8s-explorer.serviceAccountName" . }}
+  namespace: {{ .Values.appConfig.namespace | default .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: {{ include "draftt-k8s-explorer.serviceAccountName" . }}-configmap-writer
+  apiGroup: rbac.authorization.k8s.io
+{{- end -}}
