@@ -16,7 +16,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: {{ include "draftt-k8s-explorer.serviceAccountName" . }}
-  namespace: {{ .Values.namespaceOverride | default .Release.Namespace }}
+  namespace: {{ .Values.appConfig.namespace | default .Release.Namespace }}
 roleRef:
   kind: ClusterRole
   name: {{ include "draftt-k8s-explorer.serviceAccountName" . }}-readonly
