@@ -70,6 +70,10 @@ spec:
                 value: "{{ .Values.appConfig.localMode.outputType }}"
               {{- end }}
               {{- end }}
+              {{- if .Values.appConfig.logLevel }}
+              - name: LOG_LEVEL
+                value: "{{ .Values.appConfig.logLevel }}"
+              {{- end }}
           restartPolicy: {{ default "OnFailure" .Values.cronjob.restartPolicy }}
           {{- if .Values.cronjob.nodeSelector }}
           nodeSelector: {{ .Values.cronjob.nodeSelector | toYaml | nindent 12 }}
