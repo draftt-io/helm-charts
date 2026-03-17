@@ -18,7 +18,7 @@ rules:
   verbs: ["get", "list", "watch"]  # read only access
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
-{{- if and .Values.appConfig.localMode.enabled (eq .Values.appConfig.localMode.outputType "configmap" | or (eq .Values.appConfig.localMode.outputType "both")) }}
+{{- if and .Values.appConfig.localMode.enabled (or (eq .Values.appConfig.localMode.outputType "configmap") (eq .Values.appConfig.localMode.outputType "both")) }}
 - apiGroups: [""]
   resources: ["configmaps"]
   verbs: ["get", "create", "update"]
