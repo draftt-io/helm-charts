@@ -14,12 +14,12 @@ metadata:
     {{- end }}
 spec:
   schedule: "{{ .Values.cronjob.schedule }}"
-  failedJobsHistoryLimit: {{ default 3 .Values.cronjob.failedJobsHistoryLimit }}
-  successfulJobsHistoryLimit: {{ default 1 .Values.cronjob.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit }}
   jobTemplate:
     spec:
       backoffLimit: {{ .Values.cronjob.maxRetries }}
-      ttlSecondsAfterFinished: {{ default 3600 .Values.cronjob.ttlSecondsAfterFinished }}
+      ttlSecondsAfterFinished: {{ .Values.cronjob.ttlSecondsAfterFinished }}
       template:
         metadata:
           labels:
