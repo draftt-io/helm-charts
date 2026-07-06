@@ -93,6 +93,15 @@ entries:
     version: 0.1.0
   draftt-port-integration:
   - apiVersion: v2
+    appVersion: 0.0.4
+    created: "2026-07-06T15:28:04.905632488Z"
+    description: A Helm chart for Draftt - Port.io integration
+    digest: 6c0b31b16ec89f17e678274ad07a2a534afab015f84a0dcbd94402a1c2c690e5
+    name: draftt-port-integration
+    urls:
+    - https://github.com/draftt-io/helm-charts/releases/download/draftt-port-integration-0.1.1/draftt-port-integration-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     appVersion: 0.0.1
     created: "2025-07-07T10:45:57.102620782Z"
     description: A Helm chart for Draftt - Port.io integration
@@ -101,4 +110,4 @@ entries:
     urls:
     - https://github.com/draftt-io/helm-charts/releases/download/draftt-port-integration-0.1.0/draftt-port-integration-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-17T14:30:28.457257848Z"
+generated: "2026-07-06T15:28:04.905658877Z"
