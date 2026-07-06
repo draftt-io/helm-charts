@@ -10,7 +10,7 @@ image:
   # -- Repository to use for the Draftt port integration
   repository: public.ecr.aws/draftt-io/draftt-port-integration
   # -- Tag to use for the Draftt port integration
-  tag: 0.0.1
+  tag: 0.0.4
   # -- Image pull policy to use for the Draftt port integration
   pullPolicy: Always
   # -- Pull secrets to pull images from a private registry

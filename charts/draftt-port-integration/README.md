@@ -1,6 +1,6 @@
 # draftt-port-integration
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![AppVersion: 0.0.1](https://img.shields.io/badge/AppVersion-0.0.1-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![AppVersion: 0.0.4](https://img.shields.io/badge/AppVersion-0.0.4-informational?style=flat-square)
 
 A Helm chart for Draftt - Port.io integration
 
@@ -41,5 +41,5 @@ To uninstall the chart:
 | image.pullPolicy | string | `"Always"` | Image pull policy to use for the Draftt port integration |
 | image.pullSecrets | list | `[]` | Pull secrets to pull images from a private registry |
 | image.repository | string | `"public.ecr.aws/draftt-io/draftt-port-integration"` | Repository to use for the Draftt port integration |
-| image.tag | string | `"0.0.1"` | Tag to use for the Draftt port integration |
+| image.tag | string | `"0.0.4"` | Tag to use for the Draftt port integration |
 | nameOverride | string | `""` | Override the chart name |
