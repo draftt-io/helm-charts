@@ -5,26 +5,26 @@ commonLabels: {}
 # -- Override the chart name
 nameOverride: ""
 
-## Legacy Draftt explorer cronjob configuration
-legacyCronJob:
-  # -- Whether to deploy the legacy Draftt explorer cronjob
+## Draftt explorer cronjob configuration
+cronJob:
+  # -- Whether to deploy the Draftt explorer cronjob
   enabled: true
-  ## Legacy Draftt explorer image
+  ## Draftt explorer image
   image:
-    # -- Repository to use for the legacy Draftt explorer
+    # -- Repository to use for the Draftt explorer
     repository: public.ecr.aws/draftt-io/draftt-explorer
-    # -- Tag to use for the legacy Draftt explorer
+    # -- Tag to use for the Draftt explorer
     tag: 0.0.1
-    # -- Image pull policy to use for the legacy Draftt explorer
+    # -- Image pull policy to use for the Draftt explorer
     pullPolicy: Always
-    # -- Pull secrets used by the legacy Draftt explorer
+    # -- Pull secrets used by the Draftt explorer
     pullSecrets: []
-  # -- Resource requests and limits for the legacy Draftt explorer
+  # -- Resource requests and limits for the Draftt explorer
   resources:
     requests:
       cpu: 500m
       memory: 512Mi
-  # -- Legacy cronjob timing config, you can build it at: https://crontab.guru
+  # -- Cronjob timing config, you can build it at: https://crontab.guru
   # <br> **Note**: Retaining the default value (every 7 hours at :30) is advised for best performance.
   # Can be adjusted if needed.
   schedule: "30 */7 * * *"
@@ -53,7 +53,7 @@ legacyCronJob:
 
 ## Kubernetes catalog cronjob configuration
 catalogCronJob:
-  # -- Whether to deploy the Kubernetes catalog cronjob alongside the legacy cronjob
+  # -- Whether to deploy the Kubernetes catalog cronjob alongside the Draftt explorer cronjob
   enabled: true
   ## Kubernetes catalog image
   image:
@@ -65,7 +65,7 @@ catalogCronJob:
     pullPolicy: Always
     # -- Pull secrets used by the Kubernetes catalog collector
     pullSecrets: []
-  # -- Hourly catalog schedule, offset from the legacy cronjob. The Draftt API decides whether a scan is due.
+  # -- Hourly catalog schedule, offset from the original cronjob. The Draftt API decides whether a scan is due.
   schedule: "45 * * * *"
   # -- The number of successful catalog jobs to keep in history
   successfulJobsHistoryLimit: 1
@@ -104,7 +104,7 @@ appConfig:
     # <br> **Note**: If `localMode.enabled` is enabled, set this to false. Otherwise, API mode will override local mode.
     # @default -- true
     enabled: true
-    # -- Shared Draftt API base URL. The legacy collector appends `/component/k8s`; the catalog collector uses it directly.
+    # -- Shared Draftt API base URL. The cronJob appends `/component/k8s`; catalogCronJob uses it directly.
     baseUrl: "https://api.draftt.io"
     # -- The draftt API token secret.
     # A k8s generic secret should be created according to the draftt integration setup instructions.

@@ -1,15 +1,15 @@
-{{- $legacyCronJob := deepCopy .Values.legacyCronJob -}}
+{{- $cronJob := deepCopy .Values.cronJob -}}
 {{- with .Values.cronjob }}
-{{- $legacyCronJob = mergeOverwrite $legacyCronJob (deepCopy .) -}}
+{{- $cronJob = mergeOverwrite $cronJob (deepCopy .) -}}
 {{- end }}
 {{- with .Values.image }}
-{{- $_ := set $legacyCronJob "image" (mergeOverwrite (deepCopy $legacyCronJob.image) (deepCopy .)) -}}
+{{- $_ := set $cronJob "image" (mergeOverwrite (deepCopy $cronJob.image) (deepCopy .)) -}}
 {{- end }}
 {{- with .Values.resources }}
-{{- $_ := set $legacyCronJob "resources" (mergeOverwrite (deepCopy $legacyCronJob.resources) (deepCopy .)) -}}
+{{- $_ := set $cronJob "resources" (mergeOverwrite (deepCopy $cronJob.resources) (deepCopy .)) -}}
 {{- end }}
-{{- if $legacyCronJob.enabled -}}
-{{- $legacyAPIEndpoint := printf "%s/component/k8s" (include "draftt-k8s-explorer.apiBaseUrl" .) -}}
+{{- if $cronJob.enabled -}}
+{{- $apiEndpoint := printf "%s/component/k8s" (include "draftt-k8s-explorer.apiBaseUrl" .) -}}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -17,44 +17,44 @@ metadata:
   namespace: {{ .Values.appConfig.namespace | default .Release.Namespace }}
   labels:
     {{- include "draftt-explorer.labels" . | nindent 4 }}
-    {{ if $legacyCronJob.labels }}
-      {{- toYaml $legacyCronJob.labels | nindent 4 }}
+    {{ if $cronJob.labels }}
+      {{- toYaml $cronJob.labels | nindent 4 }}
     {{- end }}
   annotations:
-    {{- if $legacyCronJob.annotations }}
-      {{- toYaml $legacyCronJob.annotations | nindent 4 }}
+    {{- if $cronJob.annotations }}
+      {{- toYaml $cronJob.annotations | nindent 4 }}
     {{- end }}
 spec:
-  schedule: "{{ $legacyCronJob.schedule }}"
-  failedJobsHistoryLimit: {{ $legacyCronJob.failedJobsHistoryLimit }}
-  successfulJobsHistoryLimit: {{ $legacyCronJob.successfulJobsHistoryLimit }}
+  schedule: "{{ $cronJob.schedule }}"
+  failedJobsHistoryLimit: {{ $cronJob.failedJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ $cronJob.successfulJobsHistoryLimit }}
   jobTemplate:
     spec:
-      backoffLimit: {{ $legacyCronJob.maxRetries }}
-      ttlSecondsAfterFinished: {{ $legacyCronJob.ttlSecondsAfterFinished }}
+      backoffLimit: {{ $cronJob.maxRetries }}
+      ttlSecondsAfterFinished: {{ $cronJob.ttlSecondsAfterFinished }}
       template:
         metadata:
           labels:
             {{- include "draftt-explorer.labels" . | nindent 12 }}
-            {{- if $legacyCronJob.labels }}
-              {{- toYaml $legacyCronJob.labels | nindent 12 }}
+            {{- if $cronJob.labels }}
+              {{- toYaml $cronJob.labels | nindent 12 }}
             {{- end }}
           annotations:
-            {{- if $legacyCronJob.annotations }}
-              {{- toYaml $legacyCronJob.annotations | nindent 12 }}
+            {{- if $cronJob.annotations }}
+              {{- toYaml $cronJob.annotations | nindent 12 }}
             {{- end }}
         spec:
-          {{- if $legacyCronJob.image.pullSecrets }}
+          {{- if $cronJob.image.pullSecrets }}
           imagePullSecrets:
-          {{- toYaml $legacyCronJob.image.pullSecrets | nindent 12 }}
+          {{- toYaml $cronJob.image.pullSecrets | nindent 12 }}
           {{- end }}
           serviceAccountName: {{ include "draftt-k8s-explorer.serviceAccountName" . }}
           containers:
           - name: draftt-k8s-explorer
-            image: "{{ $legacyCronJob.image.repository }}:{{ $legacyCronJob.image.tag }}"
-            imagePullPolicy: {{ $legacyCronJob.image.pullPolicy }}
+            image: "{{ $cronJob.image.repository }}:{{ $cronJob.image.tag }}"
+            imagePullPolicy: {{ $cronJob.image.pullPolicy }}
             resources:
-              {{- toYaml $legacyCronJob.resources | nindent 14 }}
+              {{- toYaml $cronJob.resources | nindent 14 }}
             env:
               # Environment variables based on the appConfig
               - name: DRAFTT_COMPONENT_IDENTIFIER
@@ -63,7 +63,7 @@ spec:
               - name: MODE
                 value: "api"
               - name: DRAFTT_API_ENDPOINT
-                value: "{{ tpl $legacyAPIEndpoint . }}"
+                value: "{{ tpl $apiEndpoint . }}"
               {{- if .Values.appConfig.api.drafttApiToken }}
               - name: DRAFTT_API_TOKEN
                 valueFrom:
@@ -84,16 +84,16 @@ spec:
               - name: LOG_LEVEL
                 value: "{{ .Values.appConfig.logLevel }}"
               {{- end }}
-          restartPolicy: {{ default "OnFailure" $legacyCronJob.restartPolicy }}
-          {{- if $legacyCronJob.nodeSelector }}
-          nodeSelector: {{ $legacyCronJob.nodeSelector | toYaml | nindent 12 }}
+          restartPolicy: {{ default "OnFailure" $cronJob.restartPolicy }}
+          {{- if $cronJob.nodeSelector }}
+          nodeSelector: {{ $cronJob.nodeSelector | toYaml | nindent 12 }}
           {{- end }}
-          {{- if $legacyCronJob.tolerations }}
+          {{- if $cronJob.tolerations }}
           tolerations:
-            {{- toYaml $legacyCronJob.tolerations | nindent 12 }}
+            {{- toYaml $cronJob.tolerations | nindent 12 }}
           {{- end }}
-          {{- if $legacyCronJob.affinity }}
+          {{- if $cronJob.affinity }}
           affinity:
-            {{- toYaml $legacyCronJob.affinity | nindent 12 }}
+            {{- toYaml $cronJob.affinity | nindent 12 }}
           {{- end }}
 {{- end -}}
