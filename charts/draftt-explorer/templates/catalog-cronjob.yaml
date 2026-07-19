@@ -1,0 +1,80 @@
+{{- if and .Values.catalogCronJob .Values.catalogCronJob.enabled .Values.appConfig.api.enabled -}}
+{{- $baseAPIEndpoint := include "draftt-k8s-explorer.apiBaseUrl" . -}}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "draftt-k8s-explorer.catalogFullname" . }}
+  namespace: {{ .Values.appConfig.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "draftt-explorer.catalogLabels" . | nindent 4 }}
+    {{- with .Values.catalogCronJob.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.catalogCronJob.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  schedule: {{ .Values.catalogCronJob.schedule | quote }}
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: {{ .Values.catalogCronJob.failedJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ .Values.catalogCronJob.successfulJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      # The catalog agent owns request retries. Starting another pod would
+      # create a separate scan and could overlap the original attempt.
+      backoffLimit: 0
+      ttlSecondsAfterFinished: {{ .Values.catalogCronJob.ttlSecondsAfterFinished }}
+      template:
+        metadata:
+          labels:
+            {{- include "draftt-explorer.catalogLabels" . | nindent 12 }}
+            {{- with .Values.catalogCronJob.labels }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.catalogCronJob.annotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        spec:
+          {{- with .Values.catalogCronJob.image.pullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          serviceAccountName: {{ include "draftt-k8s-explorer.serviceAccountName" . }}
+          containers:
+            - name: draftt-k8s-catalog
+              image: "{{ .Values.catalogCronJob.image.repository }}:{{ .Values.catalogCronJob.image.tag }}"
+              imagePullPolicy: {{ .Values.catalogCronJob.image.pullPolicy }}
+              resources:
+                {{- toYaml .Values.catalogCronJob.resources | nindent 16 }}
+              env:
+                - name: DRAFTT_COMPONENT_IDENTIFIER
+                  value: "{{ tpl .Values.appConfig.clusterIdentifier . }}"
+                - name: DRAFTT_BASE_API_ENDPOINT
+                  value: {{ $baseAPIEndpoint | quote }}
+                {{- with .Values.appConfig.api.drafttApiToken }}
+                - name: DRAFTT_API_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .secretName | quote }}
+                      key: {{ .secretKey | quote }}
+                {{- end }}
+                {{- with .Values.appConfig.logLevel }}
+                - name: LOG_LEVEL
+                  value: {{ . | quote }}
+                {{- end }}
+          restartPolicy: Never
+          {{- with .Values.catalogCronJob.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.catalogCronJob.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.catalogCronJob.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end -}}
