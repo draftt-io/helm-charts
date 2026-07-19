@@ -43,27 +43,11 @@ kubectl logs <job-name> -n <namespace>
   completion due to pod eviction, node termination, or resource cleanup. For reliable                                                             
   data persistence, use `configmap` or `both` output type.
 
-## Kubernetes catalog cronjob
-
-In API mode, `legacyCronJob` and `catalogCronJob` run side by side with independent workload settings. They share `appConfig`, common labels, service account, and RBAC. `appConfig.api.baseUrl` is used directly by the catalog job; the legacy job appends `/component/k8s`. Set either job's `enabled` value to `false` to omit it.
-
-For upgrades from chart versions older than `2.0.0`, use:
-
-```bash
-helm upgrade draftt-explorer draftt-io/draftt-explorer \
-  --version 2.0.0 \
-  --reset-then-reuse-values \
-  --wait \
-  --cleanup-on-fail
-```
-
-If the existing release overrides `appConfig.api.drafttApiUrl`, migrate it to the API root in `appConfig.api.baseUrl` first.
-
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| appConfig.api.baseUrl | string | `"https://api.draftt.io"` | Shared Draftt API base URL. The legacy collector appends `/component/k8s`; the catalog collector uses it directly. |
+| appConfig.api.baseUrl | string | `"https://api.draftt.io"` | Shared Draftt API base URL. The cronJob appends `/component/k8s`; catalogCronJob uses it directly. |
 | appConfig.api.drafttApiToken | object | `{"secretKey":"drafttApiToken","secretName":"draftt-api-token"}` | The draftt API token secret. A k8s generic secret should be created according to the draftt integration setup instructions. <br> **Note**: Make sure the secret is created in the same namespace as the draftt explorer and the secret name and key are as specified in the values.yaml file. |
 | appConfig.api.drafttApiToken.secretKey | string | `"drafttApiToken"` | The key of the secret |
 | appConfig.api.drafttApiToken.secretName | string | `"draftt-api-token"` | The name of the secret |
@@ -75,7 +59,7 @@ If the existing release overrides `appConfig.api.drafttApiUrl`, migrate it to th
 | appConfig.namespace | string | `.Release.Namespace` | The namespace that all resources will be deployed on |
 | catalogCronJob.affinity | object | `{}` | Affinity for the catalog cronjob |
 | catalogCronJob.annotations | object | `{}` | Annotations to be added to the catalog cronjob and its pods |
-| catalogCronJob.enabled | bool | `true` | Whether to deploy the Kubernetes catalog cronjob alongside the legacy cronjob |
+| catalogCronJob.enabled | bool | `true` | Whether to deploy the Kubernetes catalog cronjob alongside the Draftt explorer cronjob |
 | catalogCronJob.failedJobsHistoryLimit | int | `3` | The number of failed catalog jobs to keep in history |
 | catalogCronJob.image.pullPolicy | string | `"Always"` | Image pull policy to use for the Kubernetes catalog collector |
 | catalogCronJob.image.pullSecrets | list | `[]` | Pull secrets used by the Kubernetes catalog collector |
@@ -84,28 +68,28 @@ If the existing release overrides `appConfig.api.drafttApiUrl`, migrate it to th
 | catalogCronJob.labels | object | `{}` | Labels to be added to the catalog cronjob and its pods |
 | catalogCronJob.nodeSelector | object | `{}` | Node selector for the catalog cronjob |
 | catalogCronJob.resources | object | `{"requests":{"cpu":"500m","memory":"512Mi"}}` | Resource requests and limits for the Kubernetes catalog collector |
-| catalogCronJob.schedule | string | `"45 * * * *"` | Hourly catalog schedule, offset from the legacy cronjob. The Draftt API decides whether a scan is due. |
+| catalogCronJob.schedule | string | `"45 * * * *"` | Hourly catalog schedule, offset from the original cronjob. The Draftt API decides whether a scan is due. |
 | catalogCronJob.successfulJobsHistoryLimit | int | `1` | The number of successful catalog jobs to keep in history |
 | catalogCronJob.tolerations | list | `[]` | Tolerations for the catalog cronjob |
 | catalogCronJob.ttlSecondsAfterFinished | int | 3600 | The TTL for a completed catalog job |
 | commonLabels | object | `{}` | Common labels to be added to all resources |
-| legacyCronJob.affinity | object | `{}` | Affinity for the cronjob |
-| legacyCronJob.annotations | object | `{}` | Annotations to be added to the cronjob |
-| legacyCronJob.enabled | bool | `true` | Whether to deploy the legacy Draftt explorer cronjob |
-| legacyCronJob.failedJobsHistoryLimit | int | `3` | The number of failed jobs to keep in the history. Older failed jobs beyond this limit are automatically deleted. |
-| legacyCronJob.image.pullPolicy | string | `"Always"` | Image pull policy to use for the legacy Draftt explorer |
-| legacyCronJob.image.pullSecrets | list | `[]` | Pull secrets used by the legacy Draftt explorer |
-| legacyCronJob.image.repository | string | `"public.ecr.aws/draftt-io/draftt-explorer"` | Repository to use for the legacy Draftt explorer |
-| legacyCronJob.image.tag | string | `"0.0.1"` | Tag to use for the legacy Draftt explorer |
-| legacyCronJob.labels | object | `{}` | Labels to be added to the cronjob |
-| legacyCronJob.maxRetries | int | `3` | the maximum number of retries for the cronjob before it is marked as failed |
-| legacyCronJob.nodeSelector | object | `{}` | Node selector for the cronjob |
-| legacyCronJob.resources | object | `{"requests":{"cpu":"500m","memory":"512Mi"}}` | Resource requests and limits for the legacy Draftt explorer |
-| legacyCronJob.restartPolicy | string | `"OnFailure"` | The restart policy for the cronjob pod |
-| legacyCronJob.schedule | string | `"30 */7 * * *"` | Legacy cronjob timing config, you can build it at: https://crontab.guru <br> **Note**: Retaining the default value (every 7 hours at :30) is advised for best performance. Can be adjusted if needed. |
-| legacyCronJob.successfulJobsHistoryLimit | int | `1` | The number of successful jobs to keep in the history. Older successful jobs beyond this limit are automatically deleted. |
-| legacyCronJob.tolerations | list | `[]` | Tolerations for the cronjob |
-| legacyCronJob.ttlSecondsAfterFinished | int | 3600 | The TTL for the cronjob pod after it is finished. <br> **Note**: The default value is 3600 seconds (1 hour). |
+| cronJob.affinity | object | `{}` | Affinity for the cronjob |
+| cronJob.annotations | object | `{}` | Annotations to be added to the cronjob |
+| cronJob.enabled | bool | `true` | Whether to deploy the Draftt explorer cronjob |
+| cronJob.failedJobsHistoryLimit | int | `3` | The number of failed jobs to keep in the history. Older failed jobs beyond this limit are automatically deleted. |
+| cronJob.image.pullPolicy | string | `"Always"` | Image pull policy to use for the Draftt explorer |
+| cronJob.image.pullSecrets | list | `[]` | Pull secrets used by the Draftt explorer |
+| cronJob.image.repository | string | `"public.ecr.aws/draftt-io/draftt-explorer"` | Repository to use for the Draftt explorer |
+| cronJob.image.tag | string | `"0.0.1"` | Tag to use for the Draftt explorer |
+| cronJob.labels | object | `{}` | Labels to be added to the cronjob |
+| cronJob.maxRetries | int | `3` | the maximum number of retries for the cronjob before it is marked as failed |
+| cronJob.nodeSelector | object | `{}` | Node selector for the cronjob |
+| cronJob.resources | object | `{"requests":{"cpu":"500m","memory":"512Mi"}}` | Resource requests and limits for the Draftt explorer |
+| cronJob.restartPolicy | string | `"OnFailure"` | The restart policy for the cronjob pod |
+| cronJob.schedule | string | `"30 */7 * * *"` | Cronjob timing config, you can build it at: https://crontab.guru <br> **Note**: Retaining the default value (every 7 hours at :30) is advised for best performance. Can be adjusted if needed. |
+| cronJob.successfulJobsHistoryLimit | int | `1` | The number of successful jobs to keep in the history. Older successful jobs beyond this limit are automatically deleted. |
+| cronJob.tolerations | list | `[]` | Tolerations for the cronjob |
+| cronJob.ttlSecondsAfterFinished | int | 3600 | The TTL for the cronjob pod after it is finished. <br> **Note**: The default value is 3600 seconds (1 hour). |
 | nameOverride | string | `""` | Override the chart name |
 | rbac.annotations | object | `{}` | Annotations to be added to rbac resources |
 | rbac.create | bool | `true` | Whether to create rbac resources <br> **Note**: When set to true, the required rbac resources will be created according to the run mode. <br> When set to false, a cluster role and a cluster role binding should be created manually according to the run mode. |

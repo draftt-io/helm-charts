@@ -42,20 +42,4 @@ kubectl logs <job-name> -n <namespace>
   completion due to pod eviction, node termination, or resource cleanup. For reliable                                                              
   data persistence, use `configmap` or `both` output type.
 
-## Kubernetes catalog cronjob
-
-In API mode, `legacyCronJob` and `catalogCronJob` run side by side with independent workload settings. They share `appConfig`, common labels, service account, and RBAC. `appConfig.api.baseUrl` is used directly by the catalog job; the legacy job appends `/component/k8s`. Set either job's `enabled` value to `false` to omit it.
-
-For upgrades from chart versions older than `2.0.0`, use:
-
-```bash
-helm upgrade draftt-explorer draftt-io/draftt-explorer \
-  --version 2.0.0 \
-  --reset-then-reuse-values \
-  --wait \
-  --cleanup-on-fail
-```
-
-If the existing release overrides `appConfig.api.drafttApiUrl`, migrate it to the API root in `appConfig.api.baseUrl` first.
-
 {{ template "chart.valuesSection" . }}
