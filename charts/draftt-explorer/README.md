@@ -80,7 +80,7 @@ If the existing release overrides `appConfig.api.drafttApiUrl`, migrate it to th
 | catalogCronJob.image.pullPolicy | string | `"Always"` | Image pull policy to use for the Kubernetes catalog collector |
 | catalogCronJob.image.pullSecrets | list | `[]` | Pull secrets used by the Kubernetes catalog collector |
 | catalogCronJob.image.repository | string | `"public.ecr.aws/draftt-io/draftt-explorer"` | Repository to use for the Kubernetes catalog collector |
-| catalogCronJob.image.tag | string | `"2.0.0-RC.3"` | Tag to use for the Kubernetes catalog collector |
+| catalogCronJob.image.tag | string | `"2.0.0"` | Tag to use for the Kubernetes catalog collector |
 | catalogCronJob.labels | object | `{}` | Labels to be added to the catalog cronjob and its pods |
 | catalogCronJob.nodeSelector | object | `{}` | Node selector for the catalog cronjob |
 | catalogCronJob.resources | object | `{"requests":{"cpu":"500m","memory":"512Mi"}}` | Resource requests and limits for the Kubernetes catalog collector |

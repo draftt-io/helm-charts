@@ -60,7 +60,7 @@ catalogCronJob:
     # -- Repository to use for the Kubernetes catalog collector
     repository: public.ecr.aws/draftt-io/draftt-explorer
     # -- Tag to use for the Kubernetes catalog collector
-    tag: 2.0.0-RC.3
+    tag: 2.0.0
     # -- Image pull policy to use for the Kubernetes catalog collector
     pullPolicy: Always
     # -- Pull secrets used by the Kubernetes catalog collector
