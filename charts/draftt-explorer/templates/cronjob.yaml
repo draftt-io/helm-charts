@@ -1,15 +1,3 @@
-{{- $cronJob := deepCopy .Values.cronJob -}}
-{{- with .Values.cronjob }}
-{{- $cronJob = mergeOverwrite $cronJob (deepCopy .) -}}
-{{- end }}
-{{- with .Values.image }}
-{{- $_ := set $cronJob "image" (mergeOverwrite (deepCopy $cronJob.image) (deepCopy .)) -}}
-{{- end }}
-{{- with .Values.resources }}
-{{- $_ := set $cronJob "resources" (mergeOverwrite (deepCopy $cronJob.resources) (deepCopy .)) -}}
-{{- end }}
-{{- if $cronJob.enabled -}}
-{{- $apiEndpoint := printf "%s/component/k8s" (include "draftt-k8s-explorer.apiBaseUrl" .) -}}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -17,44 +5,44 @@ metadata:
   namespace: {{ .Values.appConfig.namespace | default .Release.Namespace }}
   labels:
     {{- include "draftt-explorer.labels" . | nindent 4 }}
-    {{ if $cronJob.labels }}
-      {{- toYaml $cronJob.labels | nindent 4 }}
+    {{ if .Values.cronjob.labels }}
+      {{- toYaml .Values.cronjob.labels | nindent 4 }}
     {{- end }}
   annotations:
-    {{- if $cronJob.annotations }}
-      {{- toYaml $cronJob.annotations | nindent 4 }}
+    {{- if .Values.cronjob.annotations }}
+      {{- toYaml .Values.cronjob.annotations | nindent 4 }}
     {{- end }}
 spec:
-  schedule: "{{ $cronJob.schedule }}"
-  failedJobsHistoryLimit: {{ $cronJob.failedJobsHistoryLimit }}
-  successfulJobsHistoryLimit: {{ $cronJob.successfulJobsHistoryLimit }}
+  schedule: "{{ .Values.cronjob.schedule }}"
+  failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit }}
   jobTemplate:
     spec:
-      backoffLimit: {{ $cronJob.maxRetries }}
-      ttlSecondsAfterFinished: {{ $cronJob.ttlSecondsAfterFinished }}
+      backoffLimit: {{ .Values.cronjob.maxRetries }}
+      ttlSecondsAfterFinished: {{ .Values.cronjob.ttlSecondsAfterFinished }}
       template:
         metadata:
           labels:
             {{- include "draftt-explorer.labels" . | nindent 12 }}
-            {{- if $cronJob.labels }}
-              {{- toYaml $cronJob.labels | nindent 12 }}
+            {{- if .Values.cronjob.labels }}
+              {{- toYaml .Values.cronjob.labels | nindent 12 }}
             {{- end }}
           annotations:
-            {{- if $cronJob.annotations }}
-              {{- toYaml $cronJob.annotations | nindent 12 }}
+            {{- if .Values.cronjob.annotations }}
+              {{- toYaml .Values.cronjob.annotations | nindent 12 }}
             {{- end }}
         spec:
-          {{- if $cronJob.image.pullSecrets }}
+          {{- if .Values.image.pullSecrets }}
           imagePullSecrets:
-          {{- toYaml $cronJob.image.pullSecrets | nindent 12 }}
+          {{- toYaml .Values.image.pullSecrets | nindent 12 }}
           {{- end }}
           serviceAccountName: {{ include "draftt-k8s-explorer.serviceAccountName" . }}
           containers:
           - name: draftt-k8s-explorer
-            image: "{{ $cronJob.image.repository }}:{{ $cronJob.image.tag }}"
-            imagePullPolicy: {{ $cronJob.image.pullPolicy }}
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
             resources:
-              {{- toYaml $cronJob.resources | nindent 14 }}
+              {{- toYaml .Values.resources | nindent 14 }}
             env:
               # Environment variables based on the appConfig
               - name: DRAFTT_COMPONENT_IDENTIFIER
@@ -62,8 +50,10 @@ spec:
               {{- if .Values.appConfig.api.enabled }}
               - name: MODE
                 value: "api"
+              {{- if .Values.appConfig.api.drafttApiUrl }}
               - name: DRAFTT_API_ENDPOINT
-                value: "{{ tpl $apiEndpoint . }}"
+                value: "{{ .Values.appConfig.api.drafttApiUrl }}"
+              {{- end }}
               {{- if .Values.appConfig.api.drafttApiToken }}
               - name: DRAFTT_API_TOKEN
                 valueFrom:
@@ -84,16 +74,15 @@ spec:
               - name: LOG_LEVEL
                 value: "{{ .Values.appConfig.logLevel }}"
               {{- end }}
-          restartPolicy: {{ default "OnFailure" $cronJob.restartPolicy }}
-          {{- if $cronJob.nodeSelector }}
-          nodeSelector: {{ $cronJob.nodeSelector | toYaml | nindent 12 }}
+          restartPolicy: {{ default "OnFailure" .Values.cronjob.restartPolicy }}
+          {{- if .Values.cronjob.nodeSelector }}
+          nodeSelector: {{ .Values.cronjob.nodeSelector | toYaml | nindent 12 }}
           {{- end }}
-          {{- if $cronJob.tolerations }}
+          {{- if .Values.cronjob.tolerations }}
           tolerations:
-            {{- toYaml $cronJob.tolerations | nindent 12 }}
+            {{- toYaml .Values.cronjob.tolerations | nindent 12 }}
           {{- end }}
-          {{- if $cronJob.affinity }}
+          {{- if .Values.cronjob.affinity }}
           affinity:
-            {{- toYaml $cronJob.affinity | nindent 12 }}
+            {{- toYaml .Values.cronjob.affinity | nindent 12 }}
           {{- end }}
-{{- end -}}
