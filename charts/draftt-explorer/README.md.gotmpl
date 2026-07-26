@@ -13,33 +13,29 @@ To uninstall the chart:
 
     helm uninstall draftt-explorer
 
-## Run modes
+## Upgrading from 0.1.x
 
-The draftt-explorer chart supports two run modes:
+Version 2.0.0 replaces the legacy agent with the API-only Go agent.
 
-- API mode
-- Local mode
+Before upgrading, inspect the values explicitly stored with the release:
 
-**Note**: Only one run mode can be enabled at a time. If both are enabled, API mode will override local mode.
-
-### API mode
-
-API mode is the default run mode. It is used to send the data to the Draftt API.
-
-### Local mode
-
-Local mode is used to output the data to the console.
-It can be configured to output the data to one or both of the following:
-- **configmap** - `draftt-k8s-report` ConfigMap in the namespace the draftt explorer is deployed in. To retrieve the data, run:
 ```bash
-kubectl get configmap draftt-k8s-report -n <namespace> -o jsonpath='{.data.report\.json}'
+helm get values draftt-explorer -n <release-namespace>
 ```
-- **stdout** - job's pod logs. To retrieve the data, run:
+
+Update explicit overrides as follows:
+
+- Rename `cronjob.maxRetries` to `cronjob.backoffLimit`.
+- Remove or update an explicit `image.tag: 0.0.1`.
+- Remove `appConfig.localMode` and `appConfig.api.enabled`.
+
+Upgrade using the new chart defaults plus the release's explicit values:
+
 ```bash
-kubectl logs <job-name> -n <namespace>
+helm upgrade draftt-explorer draftt-io/draftt-explorer \
+  --namespace <release-namespace> \
+  --version 2.0.0 \
+  --reset-then-reuse-values
 ```
-**Note**: When using `stdout` output type, pod logs may become unavailable after job                                                             
-  completion due to pod eviction, node termination, or resource cleanup. For reliable                                                              
-  data persistence, use `configmap` or `both` output type.
 
 {{ template "chart.valuesSection" . }}

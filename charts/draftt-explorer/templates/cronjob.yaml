@@ -1,3 +1,12 @@
+{{- with .Values.appConfig.localMode }}
+{{- if .enabled }}
+{{- fail "local mode is not supported by draftt-explorer 2.0.0; remove appConfig.localMode and use API mode" }}
+{{- end }}
+{{- end }}
+{{- if and (hasKey .Values.appConfig.api "enabled") (not .Values.appConfig.api.enabled) }}
+{{- fail "draftt-explorer 2.0.0 is API-only; remove appConfig.api.enabled or set it to true" }}
+{{- end }}
+{{- $baseAPIEndpoint := include "draftt-k8s-explorer.apiBaseUrl" . -}}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -5,84 +14,69 @@ metadata:
   namespace: {{ .Values.appConfig.namespace | default .Release.Namespace }}
   labels:
     {{- include "draftt-explorer.labels" . | nindent 4 }}
-    {{ if .Values.cronjob.labels }}
-      {{- toYaml .Values.cronjob.labels | nindent 4 }}
+    {{- with .Values.cronjob.labels }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
+  {{- with .Values.cronjob.annotations }}
   annotations:
-    {{- if .Values.cronjob.annotations }}
-      {{- toYaml .Values.cronjob.annotations | nindent 4 }}
-    {{- end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
-  schedule: "{{ .Values.cronjob.schedule }}"
+  schedule: {{ .Values.cronjob.schedule | quote }}
+  concurrencyPolicy: Forbid
   failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit }}
   successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit }}
   jobTemplate:
     spec:
-      backoffLimit: {{ .Values.cronjob.maxRetries }}
+      backoffLimit: {{ .Values.cronjob.backoffLimit }}
       ttlSecondsAfterFinished: {{ .Values.cronjob.ttlSecondsAfterFinished }}
       template:
         metadata:
           labels:
             {{- include "draftt-explorer.labels" . | nindent 12 }}
-            {{- if .Values.cronjob.labels }}
-              {{- toYaml .Values.cronjob.labels | nindent 12 }}
+            {{- with .Values.cronjob.labels }}
+            {{- toYaml . | nindent 12 }}
             {{- end }}
+          {{- with .Values.cronjob.annotations }}
           annotations:
-            {{- if .Values.cronjob.annotations }}
-              {{- toYaml .Values.cronjob.annotations | nindent 12 }}
-            {{- end }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
         spec:
-          {{- if .Values.image.pullSecrets }}
+          {{- with .Values.image.pullSecrets }}
           imagePullSecrets:
-          {{- toYaml .Values.image.pullSecrets | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           serviceAccountName: {{ include "draftt-k8s-explorer.serviceAccountName" . }}
           containers:
-          - name: draftt-k8s-explorer
-            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-            imagePullPolicy: {{ .Values.image.pullPolicy }}
-            resources:
-              {{- toYaml .Values.resources | nindent 14 }}
-            env:
-              # Environment variables based on the appConfig
-              - name: DRAFTT_COMPONENT_IDENTIFIER
-                value: "{{ tpl .Values.appConfig.clusterIdentifier . }}"
-              {{- if .Values.appConfig.api.enabled }}
-              - name: MODE
-                value: "api"
-              {{- if .Values.appConfig.api.drafttApiUrl }}
-              - name: DRAFTT_API_ENDPOINT
-                value: "{{ .Values.appConfig.api.drafttApiUrl }}"
-              {{- end }}
-              {{- if .Values.appConfig.api.drafttApiToken }}
-              - name: DRAFTT_API_TOKEN
-                valueFrom:
-                  secretKeyRef:
-                    name: "{{ .Values.appConfig.api.drafttApiToken.secretName }}"
-                    key: "{{ .Values.appConfig.api.drafttApiToken.secretKey }}"
-              {{- end }}
-              {{- end }}
-              {{- if and .Values.appConfig.localMode.enabled (not .Values.appConfig.api.enabled) }}
-              - name: MODE
-                value: "local"
-              {{- if .Values.appConfig.localMode.outputType }}
-              - name: LOCAL_OUTPUT_MODE
-                value: "{{ .Values.appConfig.localMode.outputType }}"
-              {{- end }}
-              {{- end }}
-              {{- if .Values.appConfig.logLevel }}
-              - name: LOG_LEVEL
-                value: "{{ .Values.appConfig.logLevel }}"
-              {{- end }}
-          restartPolicy: {{ default "OnFailure" .Values.cronjob.restartPolicy }}
-          {{- if .Values.cronjob.nodeSelector }}
-          nodeSelector: {{ .Values.cronjob.nodeSelector | toYaml | nindent 12 }}
+            - name: draftt-k8s-explorer
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+              env:
+                - name: DRAFTT_COMPONENT_IDENTIFIER
+                  value: {{ tpl .Values.appConfig.clusterIdentifier . | quote }}
+                - name: DRAFTT_BASE_API_ENDPOINT
+                  value: {{ $baseAPIEndpoint | quote }}
+                - name: DRAFTT_API_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.appConfig.api.drafttApiToken.secretName | quote }}
+                      key: {{ .Values.appConfig.api.drafttApiToken.secretKey | quote }}
+                {{- with .Values.appConfig.logLevel }}
+                - name: LOG_LEVEL
+                  value: {{ . | quote }}
+                {{- end }}
+          restartPolicy: {{ .Values.cronjob.restartPolicy }}
+          {{- with .Values.cronjob.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if .Values.cronjob.tolerations }}
+          {{- with .Values.cronjob.tolerations }}
           tolerations:
-            {{- toYaml .Values.cronjob.tolerations | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if .Values.cronjob.affinity }}
+          {{- with .Values.cronjob.affinity }}
           affinity:
-            {{- toYaml .Values.cronjob.affinity | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}

@@ -12,6 +12,17 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Return the Draftt API base URL expected by the 2.0.0 agent. The existing value
+may contain the legacy /component/k8s endpoint used by the 0.0.1 agent.
+*/}}
+{{- define "draftt-k8s-explorer.apiBaseUrl" -}}
+{{- $apiURL := tpl (required "appConfig.api.drafttApiUrl is required" .Values.appConfig.api.drafttApiUrl) . -}}
+{{- $apiURL = trimSuffix "/" $apiURL -}}
+{{- $apiURL = trimSuffix "/component/k8s" $apiURL -}}
+{{- trimSuffix "/" $apiURL -}}
+{{- end -}}
+
+{{/*
 Common labels
 */}}
 {{- define "draftt-explorer.labels" -}}

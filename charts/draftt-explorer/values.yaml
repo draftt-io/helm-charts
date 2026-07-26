@@ -10,7 +10,7 @@ image:
   # -- Repository to use for the Draftt explorer
   repository: public.ecr.aws/draftt-io/draftt-explorer
   # -- Tag to use for the Draftt explorer
-  tag: 0.0.1
+  tag: 2.0.0
   # -- Image pull policy to use for the Draftt explorer
   pullPolicy: Always
   # -- Pull secrets to pull images from a private registry
@@ -18,14 +18,12 @@ image:
 
 ## Draftt explorer cronjob configuration
 cronjob:
-  # -- cronjob timing config, you can build it at: https://crontab.guru
-  # <br> **Note**: Retaining the default value (every 7 hours at :30) is advised for best performance.
-  # Can be adjusted if needed.
-  schedule: "30 */7 * * *"
-  # -- the maximum number of retries for the cronjob before it is marked as failed
-  maxRetries: 3
+  # -- CronJob timing configuration. The Draftt API decides whether a scan is due.
+  schedule: "45 * * * *"
+  # -- Number of retries before Kubernetes marks the Job as failed
+  backoffLimit: 1
   # -- The restart policy for the cronjob pod
-  restartPolicy: "OnFailure"
+  restartPolicy: "Never"
   # -- The number of successful jobs to keep in the history. Older successful jobs beyond this limit are automatically deleted.
   successfulJobsHistoryLimit: 1
   # -- The number of failed jobs to keep in the history. Older failed jobs beyond this limit are automatically deleted.
@@ -54,35 +52,11 @@ resources:
 
 ## Draftt explorer configuration
 appConfig:
-  # -- The namespace that all resources will be deployed on
-  # @default -- `.Release.Namespace`
-  namespace: ""
   # -- The cluster identifier, you can get it from the cluster overview page in the draftt console.
   # <br> **Note**: for the integration to work correctly, the exact cluster identifier must be provided.
   clusterIdentifier: ""
-  ## Local mode configuration
-  localMode:
-    # -- Whether to enable local mode
-    # @default -- false
-    enabled: false
-    # -- Local mode output type
-    # -- Available options: "stdout" \| "configmap" \| "both"
-    # configmap - output the data to the `draftt-k8s-report` ConfigMap in the namespace the draftt explorer is deployed in
-    # <br> To retrieve the data, run:
-    # <br> `kubectl get configmap draftt-k8s-report -n <namespace> -o jsonpath='{.data.report.json}'`
-    # stdout - output the data to job's pod logs
-    # <br> To retrieve the data, run:
-    # <br> `kubectl logs <job-name> -n <namespace>`
-    # both - output the data to both stdout and configmap
-    # <br> **Note**: Apply only if `localMode.enabled` is true.
-    # @default -- "stdout"
-    outputType: "stdout"
   ## Draftt API configuration
   api:
-    # -- Whether to enable API mode
-    # <br> **Note**: If `localMode.enabled` is enabled, set this to false. Otherwise, API mode will override local mode.
-    # @default -- true
-    enabled: true
     # -- The draftt API URL
     drafttApiUrl: "https://api.draftt.io/component/k8s"
     # -- The draftt API token secret.
@@ -101,8 +75,7 @@ appConfig:
 ## RBAC configuration
 rbac:
   # -- Whether to create rbac resources
-  # <br> **Note**: When set to true, the required rbac resources will be created according to the run mode.
-  # <br> When set to false, a cluster role and a cluster role binding should be created manually according to the run mode.
+  # <br> When set to false, a cluster role and cluster role binding must be created manually.
   create: true
   # -- Labels to be added to rbac resources
   labels: {}

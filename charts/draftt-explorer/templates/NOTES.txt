@@ -1,0 +1,8 @@
+{{- if .Release.IsInstall }}
+{{- $namespace := .Values.appConfig.namespace | default .Release.Namespace }}
+{{- $cronJobName := include "draftt-k8s-explorer.fullname" . }}
+To create a uniquely named manual Job from the CronJob:
+
+  JOB_NAME="{{ $cronJobName }}-manual-$(date +%s)"
+  kubectl create job --from=cronjob/{{ $cronJobName }} "$JOB_NAME" --namespace {{ $namespace }}
+{{- end }}
