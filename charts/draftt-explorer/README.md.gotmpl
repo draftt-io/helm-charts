@@ -13,29 +13,45 @@ To uninstall the chart:
 
     helm uninstall draftt-explorer
 
-## Upgrading from 0.1.x
+## Upgrading from agent 0.0.1
 
-Version 2.0.0 replaces the legacy agent with the API-only Go agent.
-
-Before upgrading, inspect the values explicitly stored with the release:
+Version 2.0.0 replaces the legacy agent with the API-only Go agent. These
+instructions assume the existing release was installed without a values file:
 
 ```bash
-helm get values draftt-explorer -n <release-namespace>
+helm install draftt-explorer draftt-io/draftt-explorer \
+  --set appConfig.clusterIdentifier="<YOUR_K8S_CLUSTER_IDENTIFIER>" \
+  --set appConfig.namespace="monitoring" \
+  --namespace monitoring
 ```
 
-Update explicit overrides as follows:
+Update the local repository index and confirm the existing release:
 
-- Rename `cronjob.maxRetries` to `cronjob.backoffLimit`.
-- Remove or update an explicit `image.tag: 0.0.1`.
-- Remove `appConfig.localMode` and `appConfig.api.enabled`.
+```bash
+helm repo update
+helm status draftt-explorer --namespace monitoring
+```
 
-Upgrade using the new chart defaults plus the release's explicit values:
+Upgrade using the 2.0.0 defaults and reapply only the required cluster
+identifier:
 
 ```bash
 helm upgrade draftt-explorer draftt-io/draftt-explorer \
-  --namespace <release-namespace> \
+  --namespace monitoring \
   --version 2.0.0 \
-  --reset-then-reuse-values
+  --reset-values \
+  --set-string appConfig.clusterIdentifier="<YOUR_K8S_CLUSTER_IDENTIFIER>"
+```
+
+`--reset-values` removes the stored legacy `appConfig.namespace` value and
+adopts the new 2.0.0 defaults. Resources remain in `monitoring` because it is
+the Helm release namespace.
+
+Verify the upgrade:
+
+```bash
+helm status draftt-explorer --namespace monitoring
+kubectl get cronjob draftt-explorer --namespace monitoring
 ```
 
 {{ template "chart.valuesSection" . }}
