@@ -15,8 +15,8 @@ To uninstall the chart:
 
 ## Upgrading from agent 0.0.1
 
-Version 2.0.0 replaces the legacy agent with the API-only Go agent. These
-instructions assume the existing release was installed without a values file:
+These instructions assume the existing release was installed according to the
+Draftt instructions:
 
 ```bash
 helm install draftt-explorer draftt-io/draftt-explorer \
@@ -24,6 +24,47 @@ helm install draftt-explorer draftt-io/draftt-explorer \
   --set appConfig.namespace="monitoring" \
   --namespace monitoring
 ```
+
+### Review customized installations
+
+If the installation used additional `--set` arguments or a values file, export
+the values explicitly stored with the release before upgrading:
+
+```bash
+helm get values draftt-explorer \
+  --namespace <RELEASE_NAMESPACE> \
+  --output yaml > draftt-explorer-values-0.0.1.yaml
+```
+
+The upgrade uses `--reset-values`, so all previously supplied overrides are
+removed unless they are explicitly reapplied. Review these migration targets:
+
+| Existing value | 2.0.0 action |
+| --- | --- |
+| `appConfig.clusterIdentifier` | Required: reapply the existing cluster identifier. |
+| `appConfig.namespace` | Remove. Use the Helm `--namespace` argument instead. |
+| `cronjob.maxRetries` | Rename to `cronjob.backoffLimit`. |
+| `image.tag: 0.0.1` | Remove to use the 2.0.0 default, or change it to `2.0.0`. |
+| `appConfig.localMode` | Remove; local mode is no longer supported. |
+| `appConfig.api.enabled` | Remove; version 2.0.0 is API-only. |
+
+Reapply any other required customizations only if they are still listed in the
+2.0.0 values table below, including custom API token Secret references,
+scheduling, resources, placement, labels, annotations, RBAC, and ServiceAccount
+settings.
+
+For a customized installation, create a cleaned `values-2.0.0.yaml` and pass it
+to the upgrade:
+
+```bash
+helm upgrade draftt-explorer draftt-io/draftt-explorer \
+  --namespace <RELEASE_NAMESPACE> \
+  --version 2.0.0 \
+  --reset-values \
+  --values values-2.0.0.yaml
+```
+
+### Standard upgrade
 
 Update the local repository index and confirm the existing release:
 
