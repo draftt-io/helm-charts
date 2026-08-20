@@ -8,88 +8,75 @@ A Helm chart for Draftt k8s explorer
 
 To install the draftt-explorer chart:
 
-    helm install draftt-explorer draftt-io/draftt-explorer
-
-To uninstall the chart:
-
-    helm uninstall draftt-explorer
-
-## Upgrading from agent 0.0.1
-
-These instructions assume the existing release was installed according to the
-Draftt instructions:
-
 ```bash
 helm install draftt-explorer draftt-io/draftt-explorer \
   --set appConfig.clusterIdentifier="<YOUR_K8S_CLUSTER_IDENTIFIER>" \
-  --set appConfig.namespace="monitoring" \
   --namespace monitoring
 ```
 
-### Review customized installations
-
-If the installation used additional `--set` arguments or a values file, export
-the values explicitly stored with the release before upgrading:
+To uninstall the chart:
 
 ```bash
-helm get values draftt-explorer \
-  --namespace <RELEASE_NAMESPACE> \
-  --output yaml > draftt-explorer-values-0.0.1.yaml
+helm uninstall draftt-explorer --namespace monitoring
 ```
 
-The upgrade uses `--reset-values`, so all previously supplied overrides are
-removed unless they are explicitly reapplied. Review these migration targets:
+## Upgrade from Draftt collector agent version 0.0.1
 
-| Existing value | 2.0.0 action |
-| --- | --- |
-| `appConfig.clusterIdentifier` | Required: reapply the existing cluster identifier. |
-| `appConfig.namespace` | Remove. Use the Helm `--namespace` argument instead. |
-| `cronjob.maxRetries` | Rename to `cronjob.backoffLimit`. |
-| `image.tag: 0.0.1` | Remove to use the 2.0.0 default, or change it to `2.0.0`. |
-| `appConfig.localMode` | Remove; local mode is no longer supported. |
-| `appConfig.api.enabled` | Remove; version 2.0.0 is API-only. |
+Use these instructions to upgrade an existing Draftt collector installation
+from agent version `0.0.1`. They assume you followed the installation
+instructions above.
 
-Reapply any other required customizations only if they are still listed in the
-2.0.0 values table below, including custom API token Secret references,
-scheduling, resources, placement, labels, annotations, RBAC, and ServiceAccount
-settings.
-
-For a customized installation, create a cleaned `values-2.0.0.yaml` and pass it
-to the upgrade:
-
-```bash
-helm upgrade draftt-explorer draftt-io/draftt-explorer \
-  --namespace <RELEASE_NAMESPACE> \
-  --version 2.0.0 \
-  --reset-values \
-  --values values-2.0.0.yaml
-```
-
-### Standard upgrade
-
-Update the local repository index and confirm the existing release:
+Update the local Helm repository index:
 
 ```bash
 helm repo update
-helm status draftt-explorer --namespace monitoring
 ```
 
-Upgrade using the 2.0.0 defaults and reapply only the required cluster
+### Review the current release values
+
+```bash
+helm get values draftt-explorer \
+  --namespace monitoring \
+  --output yaml
+```
+
+Review the values currently set for the release. Identify any values supported
+by the current chart that should remain configured after the upgrade. The
+upgrade uses `--reset-values`, so Helm will not retain these values
+automatically.
+
+### Standard upgrade
+
+Upgrade using the agent v2 defaults and reapply the required cluster
 identifier:
 
 ```bash
 helm upgrade draftt-explorer draftt-io/draftt-explorer \
   --namespace monitoring \
-  --version 2.0.0 \
   --reset-values \
   --set-string appConfig.clusterIdentifier="<YOUR_K8S_CLUSTER_IDENTIFIER>"
 ```
 
-`--reset-values` removes the stored legacy `appConfig.namespace` value and
-adopts the new 2.0.0 defaults. Resources remain in `monitoring` because it is
-the Helm release namespace.
+`--reset-values` removes the stored legacy values and applies the agent v2
+chart defaults. Resources remain in `monitoring` because it is the Helm release
+namespace.
 
-Verify the upgrade:
+### Customized installations
+
+If you supplied overrides with `--set` or `--set-string`, add the relevant
+overrides to the standard upgrade command.
+
+If you supplied overrides with a values file, review and edit that file before
+passing it to the upgrade command:
+
+```bash
+helm upgrade draftt-explorer draftt-io/draftt-explorer \
+  --namespace <RELEASE_NAMESPACE> \
+  --reset-values \
+  --values <VALUES_FILE>
+```
+
+### Verify the upgrade
 
 ```bash
 helm status draftt-explorer --namespace monitoring
