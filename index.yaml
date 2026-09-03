@@ -2,6 +2,15 @@ apiVersion: v1
 entries:
   draftt-explorer:
   - apiVersion: v2
+    appVersion: 2.0.0
+    created: "2026-08-20T08:35:24.780257673Z"
+    description: A Helm chart for Draftt k8s explorer
+    digest: f59448c8a18641068baf2e972ce19eeccf2678f9c11e71920e04c2400681ec0c
+    name: draftt-explorer
+    urls:
+    - https://github.com/draftt-io/helm-charts/releases/download/draftt-explorer-2.0.0/draftt-explorer-2.0.0.tgz
+    version: 2.0.0
+  - apiVersion: v2
     appVersion: 0.0.1
     created: "2026-07-21T14:21:07.030512505Z"
     description: A Helm chart for Draftt k8s explorer
